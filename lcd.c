@@ -36,6 +36,9 @@ static inline void command(uint8_t value);
 
 void lcd_init()
 {
+    // Initialise the LCD interface e.g. I2C
+    lcdIFInit();
+
 #ifdef EIGHT_BIT_MODE
     _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
 #else

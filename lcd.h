@@ -68,6 +68,7 @@ void lcd_setCursor(uint8_t, uint8_t);
 void lcd_print( const char *string );
 
 // Internal functions
+void lcdIFInit();
 void lcdWriteData( uint8_t value );
 void lcdRS( bool bOn );
 void lcdEN( bool bOn );

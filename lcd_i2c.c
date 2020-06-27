@@ -28,6 +28,12 @@
 // Default to having the backlight on
 static uint8_t regVal = LCD_BACKLIGHT;
 
+// Initialise the LCD interface i.e. the I2C interface
+void lcdIFInit()
+{
+    i2cInit();
+}
+
 // Write to the I2C expander
 static void lcd_i2c_write( uint8_t value )
 {
