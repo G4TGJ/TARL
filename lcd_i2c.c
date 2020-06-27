@@ -62,7 +62,8 @@ void lcdEN( bool bOn )
     lcd_i2c_write( (regVal & ~LCD_ENABLE_BIT) | (bOn ? LCD_ENABLE_BIT : 0) );
 }
 
-// We don't use the RW pin
+// Set or clear the RW bit
 void lcdRW( bool bOn )
 {
+    lcd_i2c_write( (regVal & ~LCD_RW_BIT) | (bOn ? LCD_RW_BIT : 0) );
 }
