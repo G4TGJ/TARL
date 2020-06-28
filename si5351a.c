@@ -164,14 +164,21 @@ static void setupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
 	uint32_t P1;					// Synth config register P1
 	uint32_t P2;					// Synth config register P2
 	uint32_t P3;					// Synth config register P3
+    uint8_t  Div4 = 0;              // Divide by 4 bits
 
 	P1 = 128 * divider - 512;
 	P2 = 0;							// P2 = 0, P3 = 1 forces an integer value for the divider
 	P3 = 1;
 
+    // If the divider is 4 then special bits to set
+    if( divider == 4 )
+    {
+        Div4 = 0x0c;
+    }
+
 	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 0,   (P3 & 0x0000FF00) >> 8);
 	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 1,   (P3 & 0x000000FF));
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv);
+	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv | Div4 );
 	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 3,   (P1 & 0x0000FF00) >> 8);
 	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 4,   (P1 & 0x000000FF));
 	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
@@ -261,6 +268,30 @@ static uint32_t getMultisynthDivider( uint32_t frequency )
     else if( frequency < 30000000 )
     {
         divider = 30;
+    }
+    else if( frequency < 45000000 )
+    {
+        divider = 20;
+    }
+    else if( frequency < 64000000 )
+    {
+        divider = 14;
+    }
+    else if( frequency < 90000000 )
+    {
+        divider = 10;
+    }
+    else if( frequency < 110000000 )
+    {
+        divider = 8;
+    }
+    else if( frequency < 150000000 )
+    {
+        divider = 6;
+    }
+    else
+    {
+        divider = 4;
     }
     return divider;
 }
