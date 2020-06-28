@@ -62,6 +62,9 @@
 #define SI_CLK_SRC_PLL_A	0b00000000
 #define SI_CLK_SRC_PLL_B	0b00100000
 
+// The number of clocks on the chip
+#define NUM_CLOCKS 3
+
 // Maximum number of times to poll for the system init bit clearing
 #define MAX_INIT_TRIES 10000
 
@@ -74,17 +77,18 @@ enum eSynthPLL
 };
 const uint8_t synthPLL[NUM_SYNTH_PLL] = { SI_SYNTH_PLL_A, SI_SYNTH_PLL_B };
 
+// Record the oscillator and PLL frequencies
+static uint32_t pllFreq[NUM_SYNTH_PLL];
+static uint32_t oscFreq[NUM_CLOCKS];
+
 // The crystal frequency which is initialised from NVRAM
 static uint32_t xtalFreq;
 
 //
 // Set up specified PLL with the specified divider and frequency
 //
-static void setupPLL(uint8_t pll, uint32_t frequency, uint32_t divider)
+static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency)
 {
-	// The PLL frequency we are going to set
-	uint32_t pllFreq;
-
 	// a, b and c as defined in AN619
 	uint32_t a, b, c;
 
@@ -112,18 +116,18 @@ static void setupPLL(uint8_t pll, uint32_t frequency, uint32_t divider)
 	    c = xtalFreq / DENOM_RATIO;
 	    
 	    // Calculate the pllFrequency: the divider * desired output frequency
-	    pllFreq = divider * frequency;
+	    pllFreq[pll] = divider * frequency;
 
 	    // Determine the multiplier to get to the required pllFrequency
 	    // Integer part is easy
-	    a = pllFreq / xtalFreq;
+	    a = pllFreq[pll] / xtalFreq;
 	    
 	    // Work out the fractional part (b/c)
 	    // c is the denominator set above
 	    // Can easily get b because we set c as a fraction of xtalFreq
 	    // b = (pllFreq % xtalFreq) * c / xtalFreq
 	    // but c is xtalFreq/27 so we get:
-	    b = (pllFreq % xtalFreq) / DENOM_RATIO;
+	    b = (pllFreq[pll] % xtalFreq) / DENOM_RATIO;
 
 	    // Calculate the values as defined in AN619
 	    uint32_t p = 128 * b / c;
@@ -156,22 +160,25 @@ static void setupPLL(uint8_t pll, uint32_t frequency, uint32_t divider)
 }
 
 //
-// Set up MultiSynth with integer divider and R divider
+// Set up MultiSynth with divider a+b/c and R divider
 // R divider is the bit value which is OR'ed onto the appropriate register, it is a #define in si5351a.h
+// 
 //
-static void setupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
+static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c, uint8_t rDiv)
 {
 	uint32_t P1;					// Synth config register P1
 	uint32_t P2;					// Synth config register P2
 	uint32_t P3;					// Synth config register P3
     uint8_t  Div4 = 0;              // Divide by 4 bits
 
-	P1 = 128 * divider - 512;
-	P2 = 0;							// P2 = 0, P3 = 1 forces an integer value for the divider
-	P3 = 1;
+	// Calculate the values as defined in AN619
+	uint32_t p = 128 * b / c;
+	P1 = 128 * a + p - 512;
+	P2 = 128 * b - c * p;
+	P3 = c;
 
     // If the divider is 4 then special bits to set
-    if( divider == 4 )
+    if( a == 4 )
     {
         Div4 = 0x0c;
     }
@@ -235,15 +242,14 @@ void oscTXClockEnable( bool bEnable )
 
 // Get the multisynth divider for the frequency
 // These have been chosen for the maximum range to avoid
-// glitches while tuning. None of the transisitions happen in
+// glitches while tuning. None of the transitions happen in
 // an amateur band.
 // These are so that the VCO is in the range 600-900MHz.
 // However, for quadrature output the maximum divider is 126 so we
 // have to use lower VCO frequencies for some bands.
 static uint32_t getMultisynthDivider( uint32_t frequency )
 {
-    // Default divider - won't work but shouldn't need to use it
-    uint32_t divider = 100;
+    uint32_t divider;
 
     if( frequency < 5000000 )
     {
@@ -295,7 +301,7 @@ static uint32_t getMultisynthDivider( uint32_t frequency )
     }
     return divider;
 }
-
+#if 0
 // Set CLK0 output ON and to the specified frequency
 // Set CLK1 output to the same but 90 degrees out of phase
 // for quadrature reception
@@ -344,8 +350,8 @@ Cool! Three rules for silky-smooth click-free tuning like on the QCX transceiver
 	    // represented by constants SI_R_DIV1 to SI_R_DIV128 (see si5351a.h header file)
 	    // If you want to output frequencies below 1MHz, you have to use the 
 	    // final R division stage
-	    setupMultisynth(SI_SYNTH_MS_0, divider, SI_R_DIV_1);
-	    setupMultisynth(SI_SYNTH_MS_1, divider, SI_R_DIV_1);
+	    setupMultisynth(SI_SYNTH_MS_0, divider, 0, 1, SI_R_DIV_1);
+	    setupMultisynth(SI_SYNTH_MS_1, divider, 0, 1, SI_R_DIV_1);
 
         // Delay is needed as sometimes the phase difference is other than
         // 90 degrees without it
@@ -408,7 +414,10 @@ void oscSetTXFrequency(uint32_t frequency)
 		// represented by constants SI_R_DIV1 to SI_R_DIV128 (see si5351a.h header file)
 		// If you want to output frequencies below 1MHz, you have to use the
 		// final R division stage
-		setupMultisynth(SI_SYNTH_MS_2, divider, SI_R_DIV_1);
+		setupMultisynth(SI_SYNTH_MS_2, divider, 0, 1, SI_R_DIV_1);
+
+        // Delay sometimes needed for it to take changes
+        delay(2);
 
 		// Switch on CLK2 for the TX frequency which is derived from PLL B
 		i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK2_CONTROL, 0x4F | SI_CLK_SRC_PLL_B);
@@ -420,6 +429,127 @@ void oscSetTXFrequency(uint32_t frequency)
 		prevDivider = divider;
 	}
 }
+#endif
+// Calculate the divider (a+b/c) for a given oscillator frequency and PLL frequency
+static void calcDivider( uint32_t frequency, uint32_t pllFreq, uint32_t *pa, uint32_t *pb, uint32_t *pc )
+{
+    // Intermediate calculations
+    uint32_t d, r;
+
+    // Firstly work out the divider a and the remainder
+    *pa = pllFreq / frequency;
+    r = pllFreq % frequency;
+
+    // b/c == r/frequency but we can't use these directly since
+    // c can only be up to 1048575 so have to scale for this
+    // We will scale by d to achieve this
+    // (1000000/48575 is about 21)
+    if( frequency < 21000000 )
+    {
+        d = 21;
+    }
+    else
+    {
+        d = frequency / 1000000;
+    }
+
+    *pb = r / d;
+    *pc = frequency / d;
+}
+
+void oscSetFrequency( uint8_t clock, uint32_t frequency )
+{
+    // To get the output frequency the PLL is divided by a+b/c
+	uint32_t a, b, c;
+
+    // The register, clock and reset bit for the PLL for this oscillator
+    uint8_t pll, pll_clock, pll_reset;
+
+	// We will reset the PLLs only when the divider changes
+	static uint32_t prevDivider[NUM_CLOCKS];
+
+    // Keep track of each clock's frequency
+    oscFreq[clock] = frequency;
+
+	// Get the predetermined multisynth divider for the frequency
+    // Except that clock 1 uses the same divider as clock 0
+    // because they share a PLL
+    if( clock == 1 )
+    {
+        // Clock 1 is using PLL A which has been set up for clock 0
+        // We need to calculate our own divider (a+b/c)
+        calcDivider( frequency, pllFreq[SYNTH_PLL_A], &a, &b, &c );
+    }
+    else
+    {
+        // Clocks 0 and 2 set the PLL up with a predetermined integer divider
+    	a = getMultisynthDivider( frequency );
+        b = 0;
+        c = 1;
+    }
+
+    // Choose the PLL.
+    // Clocks 0 and 1 use PLL A
+    // Clock 2 uses PLL B
+    if( clock == 2 )
+    {
+        pll = SYNTH_PLL_B;
+        pll_reset = SI_PLL_RESET_B;
+        pll_clock = SI_CLK_SRC_PLL_B;
+    }
+    else
+    {
+        pll = SYNTH_PLL_A;
+        pll_reset = SI_PLL_RESET_A;
+        pll_clock = SI_CLK_SRC_PLL_A;
+    }
+
+	// Set up the PLL
+    // Clock 1 uses the same PLL as clock 0
+    if( clock != 1 )
+    {
+	    setupPLL(pll, a, frequency);
+    }
+
+    // Set up the multiSynth divider, with the calculated divider.
+    // The final R division stage can divide by a power of two, from 1..128.
+    // represented by constants SI_R_DIV1 to SI_R_DIV128 (see si5351a.h header file)
+    // If you want to output frequencies below 1MHz, you have to use the
+    // final R division stage
+    setupMultisynth(SI_SYNTH_MS_0+(8*clock), a, b, c, SI_R_DIV_1);
+
+    // Delay needed for it to take changes
+    delay(5);
+
+    // Switch on the clock
+    i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_CONTROL+clock, 0x4F | pll_clock);
+
+    // If we are setting clock 0 then we need to also set the multisynth divider for
+    // clock 1 because it also uses PLL A
+    if( clock == 0 )
+    {
+        uint32_t a1, b1, c1;
+        calcDivider( oscFreq[1], pllFreq[SYNTH_PLL_A], &a1, &b1, &c1 );
+
+        setupMultisynth(SI_SYNTH_MS_1, a1, b1, c1, SI_R_DIV_1);
+
+        delay(5);
+    }
+
+	// If the divider has changed then set everything up
+	// This will usually only happen at power up
+	// but will also happen if the frequency changes enough
+    // Never reset the PLL for clock 1 as it uses clock 0's PLL
+	if( (clock != 1) && (a != prevDivider[clock]) )
+	{
+    	// Reset the PLLs. This causes a glitch in the output. For small changes to
+    	// the parameters, you don't need to reset the PLL, and there is no glitch
+    	i2cSendRegister(SI5351A_I2C_ADDRESS, SI_PLL_RESET, pll_reset);
+
+    	prevDivider[clock] = a;
+	}
+}
+
 
 // Set the crystal frequency. This is initialised from NVRAM but can be
 // changed from the menu.

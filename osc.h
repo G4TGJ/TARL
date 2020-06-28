@@ -11,6 +11,7 @@
 #include <inttypes.h>
 
 bool oscInit( void );
+void oscSetFrequency( uint8_t clock, uint32_t freq );
 void oscSetRXFrequency(uint32_t frequency, bool bCWReverse );
 void oscSetTXFrequency(uint32_t frequency);
 void oscRXClockEnable( bool bEnable );
