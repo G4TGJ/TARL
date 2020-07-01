@@ -462,8 +462,18 @@ static uint8_t getRDiv( uint32_t *pFreq )
     return rDiv;
 }
 
-void oscSetFrequency( uint8_t clock, uint32_t frequency )
+// Set the clock to the given frequency with optional quadrature.
+//
+// quadrature is only used for clock 1 - it is ignored for the others
+// +ve is CLK0 leads CLK1 by 90 degrees
+// -ve is CLK0 lags  CLK1 by 90 degrees
+// 0 is no quadrature i.e. set the frequency as normal
+// When quadrature is set for clock 1 then it is set to the same frequency as clock 0
+void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
 {
+    // Whether quadrature has been enabled
+    static int8_t quadrature;
+
     // To get the output frequency the PLL is divided by a+b/c
 	uint32_t a, b, c;
 
@@ -476,8 +486,9 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency )
     // The first (or only) clock we are setting
     uint8_t firstClock;
 
-	// We will reset the PLLs only when the divider changes
+	// We will reset the PLLs only when the divider or quadrature changes
 	static uint32_t prevDivider[NUM_CLOCKS];
+    static int8_t prevQuadrature;
 
     // Lower frequencies need an extra R Divider
     // in which case we have to increase the actual clock frequency
@@ -487,10 +498,22 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency )
     // Keep track of each clock's frequency
     oscFreq[clock] = frequency;
 
+    // For clock 1 we note the quadrature setting - this can also affect clock 0 because
+    // we are limited in the dividers we can use in quadrature
+    if( clock == 1 )
+    {
+        quadrature = q;
+
+        // If the quadrature has changed then we set the previous divider to zero to 
+        // force the PLL to be reset
+        if( quadrature != prevQuadrature )
+        {
+            prevDivider[clock] = 0;
+            prevQuadrature = quadrature;
+        }
+    }
+
 	// Get the predetermined multisynth divider for the frequency
-    //
-    // Clocks 0 and 1 share PLL A so we set the divider based
-    // on the higher clock frequency.
     if( clock == 2 )
     {
     	a = getMultisynthDivider( frequency, false );
@@ -505,12 +528,21 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency )
     }
     else
     {
+        // In quadrature set clock 1 frequency to the same as clock 0
+        if( quadrature )
+        {
+            oscFreq[1] = oscFreq[0];
+            rDiv[1] = rDiv[0];
+        }
+
+        // Clocks 0 and 1 share PLL A so we set the divider based
+        // on the higher clock frequency.
         // We will always set clock 0 first
         firstClock = 0;
         if( oscFreq[0] >= oscFreq[1] )
         {
             // Clock 0 is the higher frequency so get its integer divider
-    	    a = getMultisynthDivider( oscFreq[0], false );
+    	    a = getMultisynthDivider( oscFreq[0], quadrature != 0 );
     	    b = 0;
     	    c = 1;
 
@@ -518,11 +550,22 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency )
 	        setupPLL(SYNTH_PLL_A, a, oscFreq[0]);
 
             // Work out the required divider for clock 1
-            calcDivider( oscFreq[1], pllFreq[SYNTH_PLL_A], &a1, &b1, &c1 );
+            if( quadrature )
+            {
+                // In quadrature clock 1 is the same frequency as clock 0
+                a1 = a;
+                b1 = b;
+                c1 = c;
+            }
+            else
+            {
+                calcDivider( oscFreq[1], pllFreq[SYNTH_PLL_A], &a1, &b1, &c1 );
+            }
         }
         else
         {
             // Clock 1 is the higher frequency so get its integer divider
+            // In quadrature mode won't get here as the oscillator frequencies are equal
     	    a1 = getMultisynthDivider( oscFreq[1], false );
     	    b1 = 0;
     	    c1 = 1;
@@ -546,6 +589,21 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency )
 
     // Delay needed for it to take changes
     delay(5);
+
+    // Set quadrature mode if applicable (only for clock 0 or clock 1)
+    if( (clock != 2) && (quadrature != 0) )
+    {
+        if( quadrature > 0)
+        {
+            i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
+            i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
+        }
+        else
+        {
+            i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, a);
+            i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
+        }
+    }
 
     // Switch on the clock
     i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_CONTROL+clock, 0x4F | pll_clock);
