@@ -228,16 +228,10 @@ static void si5351aOutputEnable( uint8_t clk, bool bEnable )
 	}
 }
 
-// Enable/disable the RX clock outputs
-void oscRXClockEnable( bool bEnable )
+// Enable/disable a clock output
+void oscClockEnable( uint8_t clock, bool bEnable )
 {
-	si5351aOutputEnable( SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1, bEnable );
-}
-
-// Enable/disable the TX clock output
-void oscTXClockEnable( bool bEnable )
-{
-    si5351aOutputEnable( SI_CLK_ENABLE_2, bEnable );
+	si5351aOutputEnable( SI_CLK_ENABLE_0 << clock, bEnable );
 }
 
 // Get the multisynth divider for the frequency
