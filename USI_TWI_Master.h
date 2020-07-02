@@ -32,18 +32,9 @@
 
 #define TWI_US_DELAY (F_CPU/1000000)
 
-#define DELAY_T2TWI (__builtin_avr_delay_cycles(3*TWI_US_DELAY))
-#define DELAY_T4TWI (__builtin_avr_delay_cycles(2*TWI_US_DELAY))
+#define DELAY_T2TWI (__builtin_avr_delay_cycles(2*TWI_US_DELAY))
+#define DELAY_T4TWI (__builtin_avr_delay_cycles(1*TWI_US_DELAY))
 
-//#define 
-// Defines controling code generating
-//#define PARAM_VERIFICATION
-//#define NOISE_TESTING
-//#define SIGNAL_VERIFY
-
-// USI_TWI messages and flags and bit masks
-//#define SUCCESS   7
-//#define MSG       0
 /****************************************************************************
   Bit and byte definitions
 ****************************************************************************/
@@ -128,15 +119,3 @@
 #define PIN_USI_SCL PINB7
 #endif
 #endif //__GNUC__
-
-// General defines
-#define TRUE 1
-#define FALSE 0
-
-static void USI_TWI_Master_Initialise(void);
-#ifndef __GNUC__
-__x // AVR compiler
-#endif
-static unsigned char USI_TWI_Start_Transceiver_With_Data(unsigned char *, unsigned char);
-
-static unsigned char USI_TWI_Get_State_Info(void);
