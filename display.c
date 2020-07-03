@@ -12,12 +12,6 @@
 
 #include "config.h"
 #include "display.h"
-#include "morse.h"
-
-#ifdef DISABLE_LCD
-#define lcd_setCursor(a, b)
-#define lcd_blink() 
-#else
 #include "lcd.h"
 
 // Keep track of each line
@@ -26,9 +20,9 @@ static char textBuf[LCD_HEIGHT][ LCD_WIDTH + 1];
 // Keep track of the cursor position
 static uint8_t cursorCol, cursorLine;
 
+#ifdef ENABLE_DISPLAY_SPLIT_LINE
 // Split point for the line
 static uint8_t splitPoint[LCD_HEIGHT];
-
 #endif
 
 // Update the line buffer
@@ -36,7 +30,6 @@ static uint8_t splitPoint[LCD_HEIGHT];
 // in which case the new text replaces the existing line
 void displayText( uint8_t line, char *text, bool bReplace )
 {
-#ifndef DISABLE_LCD
 	// Number of chars in new string
 	uint8_t newLen = strlen( text );
 	
@@ -55,19 +48,24 @@ void displayText( uint8_t line, char *text, bool bReplace )
         if( bReplace )
         {
             // Replacing line so copy text over and then pad with spaces
-            // Only pad with spaces up to the split point, if there is one
             for( int i = 0 ; i < LCD_WIDTH ; i++ )
             {
                 if( i < newLen )
                 {
                     pBuf[i] = text[i];
                 }
+#ifdef ENABLE_DISPLAY_SPLIT_LINE
+                // Only pad with spaces up to the split point, if there is one
                 else if( (i < splitPoint[line]) || (splitPoint[line] == 0) )
+#else
+                else
+#endif
                 {
                     pBuf[i] = ' ';
                 }
             }
         }
+#ifdef ENABLE_DISPLAY_SPLIT_LINE
         else
         {
             // Copy characters over to the text buffer
@@ -87,6 +85,7 @@ void displayText( uint8_t line, char *text, bool bReplace )
                 }
             }
         }
+#endif
         // Move to the start of the line and print the buffer
         lcd_setCursor( 0, line );
         lcd_print( pBuf );
@@ -94,12 +93,10 @@ void displayText( uint8_t line, char *text, bool bReplace )
         // Put the cursor back to where it was
         lcd_setCursor( cursorCol, cursorLine );
     }
-#endif
 }
 
 void displayConfigure()
 {
-#ifndef DISABLE_LCD
     lcd_init();
 
 	// Set up the LCD's number of columns and rows:
@@ -115,13 +112,11 @@ void displayConfigure()
         memset( textBuf[line], ' ', LCD_WIDTH );
         textBuf[line][LCD_WIDTH] = '\0';
     }
-#endif
 }
 	
 // Set the cursor position and state (off, underline or blink)
 void displayCursor( uint8_t col, uint8_t line, enum eCursorState state )
 {
-#ifndef DISABLE_LCD
     // Keep track of cursor position so we can move it back after updating the display
     cursorCol = col;
     cursorLine = line;
@@ -147,17 +142,16 @@ void displayCursor( uint8_t col, uint8_t line, enum eCursorState state )
             lcd_blink();
             break;
     }
-#endif
 }
 
+#ifdef ENABLE_DISPLAY_SPLIT_LINE
 // Split a line at the given column. This means text will scroll up to that
 // point.
 void displaySplitLine( uint8_t col, uint8_t line )
 {
-#ifndef DISABLE_LCD
     if( (line < LCD_HEIGHT) && (col < LCD_WIDTH) )
     {
         splitPoint[line] = col;
     }
-#endif
 }
+#endif
