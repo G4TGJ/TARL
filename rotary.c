@@ -48,111 +48,111 @@ static void debounceSwitch( bool bSwitchDown, bool *pbShortPress, bool *pbLongPr
     {
         // Currently idle i.e. nothing pressed
         case SWITCH_IDLE:
-        // If the switch is pressed then debounce it
-        if( bSwitchDown )
-        {
-            // Start the debounce timer
-            debounceTimer = currentTime + debounceTime;
-            switchState = SWITCH_DOWN;
-        }
-        break;
+            // If the switch is pressed then debounce it
+            if( bSwitchDown )
+            {
+                // Start the debounce timer
+                debounceTimer = currentTime + debounceTime;
+                switchState = SWITCH_DOWN;
+            }
+            break;
 
         // The switch is down but not yet debounced
         case SWITCH_DOWN:
-        // If the switch is released then back to idle
-        // to start debounce timer again
-        if( !bSwitchDown )
-        {
-            switchState = SWITCH_IDLE;
-        }
-        // If switch down long enough then it can be
-        // considered pressed.
-        // Have to see how long it is pressed for
-        else if( currentTime > debounceTimer )
-        {
-            // Start the long press time if appropriate
-            if( longPressTime > 0 )
+            // If the switch is released then back to idle
+            // to start debounce timer again
+            if( !bSwitchDown )
             {
-                // Start the long press timer
-                longPressTimer = currentTime + longPressTime;
+                switchState = SWITCH_IDLE;
             }
-            else
+            // If switch down long enough then it can be
+            // considered pressed.
+            // Have to see how long it is pressed for
+            else if( currentTime > debounceTimer )
             {
-                // Can consider button pressed
-                *pbShortPress = true;
+                // Start the long press time if appropriate
+                if( longPressTime > 0 )
+                {
+                    // Start the long press timer
+                    longPressTimer = currentTime + longPressTime;
+                }
+                else
+                {
+                    // Can consider button pressed
+                    *pbShortPress = true;
+                }
+                switchState = SWITCH_PRESSED;
             }
-            switchState = SWITCH_PRESSED;
-        }
-        break;
+            break;
 
         // The switch has been down long enough to have
         // been debounced
         case SWITCH_PRESSED:
-        // Switch is no longer pressed so need to start
-        // the debounce process
-        if( !bSwitchDown )
-        {
-            // Start the debounce timer
-            debounceTimer = currentTime + debounceTime;
-
-            // Also restart the long press timer to
-            // prevent a spurious result
-            longPressTimer = currentTime + longPressTime;
-
-            switchState = SWITCH_RELEASED;
-        }
-        // Are we interested in long presses?
-        else if( longPressTime > 0 )
-        {
-            // The switch has been down long enough that it is
-            // a long press
-            if( currentTime > longPressTimer )
+            // Switch is no longer pressed so need to start
+            // the debounce process
+            if( !bSwitchDown )
             {
-                *pbLongPress = true;
-                switchState = SWITCH_LONG_PRESS;
+                // Start the debounce timer
+                debounceTimer = currentTime + debounceTime;
+
+                // Also restart the long press timer to
+                // prevent a spurious result
+                longPressTimer = currentTime + longPressTime;
+
+                switchState = SWITCH_RELEASED;
             }
-        }
-        else
-        {
-            // Switch is still down
-            *pbShortPress = true;
-        }
-        break;
+            // Are we interested in long presses?
+            else if( longPressTime > 0 )
+            {
+                // The switch has been down long enough that it is
+                // a long press
+                if( currentTime > longPressTimer )
+                {
+                    *pbLongPress = true;
+                    switchState = SWITCH_LONG_PRESS;
+                }
+            }
+            else
+            {
+                // Switch is still down
+                *pbShortPress = true;
+            }
+            break;
 
         // The switch was down but has now been released
         case SWITCH_RELEASED:
-        // If the switch is down again then keep
-        // debouncing
-        if( bSwitchDown )
-        {
-            switchState = SWITCH_PRESSED;
-        }
-        // The switch has been up long enough so it is
-        // a short press and we are idle again
-        else if( currentTime > debounceTimer )
-        {
-            // If the long press time is zero we will will have already
-            // reported the button when it was pressed
-            if( longPressTime > 0 )
+            // If the switch is down again then keep
+            // debouncing
+            if( bSwitchDown )
             {
-                *pbShortPress = true;
+                switchState = SWITCH_PRESSED;
             }
-            switchState = SWITCH_IDLE;
-        }
-        break;
+            // The switch has been up long enough so it is
+            // a short press and we are idle again
+            else if( currentTime > debounceTimer )
+            {
+                // If the long press time is zero we will will have already
+                // reported the button when it was pressed
+                if( longPressTime > 0 )
+                {
+                    *pbShortPress = true;
+                }
+                switchState = SWITCH_IDLE;
+            }
+            break;
 
         // The switch has been pressed a long time so just waiting
         // for it to be released.
         case SWITCH_LONG_PRESS:
-        if( !bSwitchDown )
-        {
-            switchState = SWITCH_IDLE;
-        }
-        break;
+            if( !bSwitchDown )
+            {
+                switchState = SWITCH_IDLE;
+            }
+            break;
 
         default:
-        // Should never get here
-        break;
+            // Should never get here
+            break;
     }
 }
 
@@ -241,11 +241,6 @@ void readRotary( bool *pbCW, bool *pbCCW, bool *pbShortPress, bool *pbLongPress 
             // Work out the transition - shift the previous state up and incorporate the new state
             transition = ((transition&3)<<2) | (bRotaryB<<1) | bRotaryA;
 
-            #if 0
-            char buf[TEXT_BUF_LEN];
-            sprintf( buf, "%c%c%c%c:%d ", (transition&8?'1':'0'), (transition&4?'1':'0'), (transition&2?'1':'0'), (transition&1?'1':'0'), direction[transition] );
-            serialTXString( buf );
-            #endif
             // For a valid rotation need 4 valid rotations in that direction
             countDirection++;
             if( direction[transition] == prevDirection )
