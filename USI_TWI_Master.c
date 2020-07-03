@@ -6,6 +6,8 @@
  * Date              : $Date: 2016-7-15 $
  * Updated by        : $Author: Atmel $
  *
+ * Tidied up by Richard Tomlinson G4TGJ 2/7/2020
+ *
  * Support mail      : avr@atmel.com
  *
  * Supported devices : All device with USI module can be used.
