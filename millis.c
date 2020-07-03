@@ -28,7 +28,7 @@
 // Clock is running at fraction of CPU clock
 #define CTC_MATCH_OVERFLOW (F_CPU / CLOCK_DIV / 1000)
 
-volatile unsigned long timer1_ticks;
+volatile uint32_t timer1_ticks;
  
 ISR (TIMER1_COMPA_vect)
 {
@@ -36,9 +36,9 @@ ISR (TIMER1_COMPA_vect)
 }
 
 // Return the current millisecond tick count
-unsigned long millis ()
+uint32_t millis ()
 {
-    unsigned long ticks;
+    uint32_t ticks;
 
     // Ensure this cannot be disrupted
     ATOMIC_BLOCK(ATOMIC_FORCEON) {
@@ -52,7 +52,7 @@ unsigned long millis ()
 // This is a busy wait so use with care
 void delay( uint16_t ms )
 {
-    volatile unsigned long endTime = millis() + ms;
+    volatile uint32_t endTime = millis() + ms;
     for( ; millis() < endTime ; );
 }
 
