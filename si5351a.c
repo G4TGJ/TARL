@@ -62,9 +62,6 @@
 #define SI_CLK_SRC_PLL_A	0b00000000
 #define SI_CLK_SRC_PLL_B	0b00100000
 
-// The number of clocks on the chip
-#define NUM_CLOCKS 3
-
 // Maximum number of times to poll for the system init bit clearing
 #define MAX_INIT_TRIES 10000
 
