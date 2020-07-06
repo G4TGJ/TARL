@@ -6,9 +6,15 @@ non-radio systems.
 
 These files have been tested on the ATTiny85 - testing and full support for the ATMega328P will be added soon.
 
+When adding these files to your project in Atmel Studio you should add them as links rather than copying them over. This way you can easily update the library when I issue
+new versions. You should add as links the C files that you need so that they are compiled. You can also link to the header files but this does not bring them into the 
+compilation. For the compiler to find them you need to add their path in Project Properties.
+
 ## config.h
 
 All source files include config.h. It is used to customise the library for specific hardware, e.g. IO ports, I2C address, frequency ranges.
+
+config.h is not part of the library but should be provided as part of your project.
 
 ## LCD
 
