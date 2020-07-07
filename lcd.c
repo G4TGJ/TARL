@@ -3,9 +3,10 @@
 #include <inttypes.h>
 #include <avr/io.h>
 
- #include "config.h"
- #include "lcd.h"
- #include "millis.h"
+#include "config.h"
+#include "lcd.h"
+#include "millis.h"
+
 
 #define DISPLAY_FUNCTION  (LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS | LCD_2LINE)
 
