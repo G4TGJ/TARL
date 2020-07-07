@@ -10,8 +10,19 @@
  
 #include "config.h"
 
-// Calculate the value needed for 
+// Calculate the value needed for
 // the CTC match value in OCR1A.
+#ifdef OCR1AH
+
+// 16 bit timer
+#if F_CPU == 16000000
+// 16MHz: clock divided by 8
+#define CLOCK_DIV 8
+#define CLOCK_SELECT  ((1 << CS11))
+#endif
+
+#else
+// 8 bit timer
 // This is an 8 bit register so we have to divide the
 // clock such that we don't overflow this.
 
@@ -23,6 +34,7 @@
 // 8MHz: clock divided by 32
 #define CLOCK_DIV 32
 #define CLOCK_SELECT  ((1 << CS12) | (1 << CS11))
+#endif
 #endif
 
 // Clock is running at fraction of CPU clock
@@ -59,15 +71,30 @@ void delay( uint16_t ms )
 // Initialise the timer
 void setup_millis(void)
 {
+#ifdef OCR1AH
+    // 16 bit timer
+    // CTC mode, Clock/8
+    TCCR1B |= (1 << WGM12) | CLOCK_SELECT;
+    
+    // Load the high byte, then the low byte
+    // into the output compare
+    OCR1AH = (CTC_MATCH_OVERFLOW >> 8);
+    OCR1AL = (CTC_MATCH_OVERFLOW & 0xFF);
+
+    // Enable the compare match interrupt
+    TIMSK1 |= (1 << OCIE1A);
+#else
+    // 8 bit timer
     // CTC mode
     TCCR1 = (1 << CTC1) | CLOCK_SELECT;
  
     // Load the high byte, then the low byte
     // into the output compare
     OCR1A = CTC_MATCH_OVERFLOW;
- 
+
     // Enable the compare match interrupt
     TIMSK |= (1 << OCIE1A);
+#endif
     
     // Now enable global interrupts
     sei();
