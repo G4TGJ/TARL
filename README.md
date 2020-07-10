@@ -4,7 +4,7 @@
 This library is a set of source files for AVR processors that provide functionality of use in amateur radio applications, although many of the files could also be used in 
 non-radio systems.
 
-These files have been tested on the ATTiny85 - testing and full support for the ATMega328P will be added soon.
+These files have been tested on the ATTiny85 and ATMega328P.
 
 When adding these files to your project in Atmel Studio you should add them as links rather than copying them over. This way you can easily update the library when I issue
 new versions. You should add as links the C files that you need so that they are compiled. You can also link to the header files but this does not bring them into the 
@@ -94,3 +94,20 @@ Currently only supports the Si5351A chip with 3 outputs. CLK0 and CLK1 use PLL A
 |osc.h|Oscillator Header|
 |si5351a.c|Si5351A Driver|
 
+## Serial
+
+Serial port driver.
+
+|Serial| |
+|----|------|
+|serial.h|Serial Header|
+|serial.c|Serial Driver|
+
+## CAT Control
+
+CAT control simulating the Yaesu FT450D. Requires the serial driver.
+
+|CAT Control| |
+|----|------|
+|cat.h|CAT Control Header|
+|cat.c|CAT Control Driver|
