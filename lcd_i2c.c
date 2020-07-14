@@ -35,11 +35,11 @@ void lcdIFInit()
 }
 
 // Write to the I2C expander
-static void lcd_i2c_write( uint8_t value )
+static void lcdI2CWrite( uint8_t value )
 {
     // We use the pre-existing I2C send register function which actually sends the
     // data twice (this simple device has no register addresses)
-    i2cSendRegister( LCD_I2C_ADDRESS, value, value );
+    i2cWriteRegister( LCD_I2C_ADDRESS, value, value );
 
     regVal = value;
 }
@@ -47,23 +47,23 @@ static void lcd_i2c_write( uint8_t value )
 // Write to the LCD's data bits
 void lcdWriteData( uint8_t value )
 {
-    lcd_i2c_write( (regVal & ~DATA_BITS) | (value << DATA_POS) );
+    lcdI2CWrite( (regVal & ~DATA_BITS) | (value << DATA_POS) );
 }
 
 // Set or clear the RS bit
 void lcdRS( bool bOn )
 {
-    lcd_i2c_write( (regVal & ~LCD_RS_BIT) | (bOn ? LCD_RS_BIT : 0) );
+    lcdI2CWrite( (regVal & ~LCD_RS_BIT) | (bOn ? LCD_RS_BIT : 0) );
 }
 
 // Set or clear the EN bit
 void lcdEN( bool bOn )
 {
-    lcd_i2c_write( (regVal & ~LCD_ENABLE_BIT) | (bOn ? LCD_ENABLE_BIT : 0) );
+    lcdI2CWrite( (regVal & ~LCD_ENABLE_BIT) | (bOn ? LCD_ENABLE_BIT : 0) );
 }
 
 // Set or clear the RW bit
 void lcdRW( bool bOn )
 {
-    lcd_i2c_write( (regVal & ~LCD_RW_BIT) | (bOn ? LCD_RW_BIT : 0) );
+    lcdI2CWrite( (regVal & ~LCD_RW_BIT) | (bOn ? LCD_RW_BIT : 0) );
 }

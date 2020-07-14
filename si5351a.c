@@ -149,7 +149,7 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency)
             // this last register latches in the new values.
             if( i == 7 || (newPll[pll][i] != prevPll[pll][i]) )
             {
-                i2cSendRegister(SI5351A_I2C_ADDRESS, synthPLL[pll] + i, newPll[pll][i]);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, synthPLL[pll] + i, newPll[pll][i]);
                 prevPll[pll][i] = newPll[pll][i];
             }
         }
@@ -180,14 +180,14 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c, u
         Div4 = 0x0c;
     }
 
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 0,   (P3 & 0x0000FF00) >> 8);
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 1,   (P3 & 0x000000FF));
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv | Div4 );
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 3,   (P1 & 0x0000FF00) >> 8);
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 4,   (P1 & 0x000000FF));
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 6,   (P2 & 0x0000FF00) >> 8);
-	i2cSendRegister(SI5351A_I2C_ADDRESS, synth + 7,   (P2 & 0x000000FF));
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 0,   (P3 & 0x0000FF00) >> 8);
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 1,   (P3 & 0x000000FF));
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv | Div4 );
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 3,   (P1 & 0x0000FF00) >> 8);
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 4,   (P1 & 0x000000FF));
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 6,   (P2 & 0x0000FF00) >> 8);
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 7,   (P2 & 0x000000FF));
 }
 
 //
@@ -197,7 +197,7 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c, u
 //
 static void si5351aOutputOff(uint8_t clk)
 {
-	i2cSendRegister(SI5351A_I2C_ADDRESS, clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+	i2cWriteRegister(SI5351A_I2C_ADDRESS, clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 }
 
 // Enable/disable the clock output
@@ -221,7 +221,7 @@ static void si5351aOutputEnable( uint8_t clk, bool bEnable )
             // Disable by setting the bit
             reg |= clk;
         }
-    	i2cSendRegister( SI5351A_I2C_ADDRESS, SI_CLK_ENABLE, reg );
+    	i2cWriteRegister( SI5351A_I2C_ADDRESS, SI_CLK_ENABLE, reg );
 	}
 }
 
@@ -592,18 +592,18 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
         {
             if( quadrature > 0)
             {
-                i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
-                i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
             }
             else
             {
-                i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, a);
-                i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, a);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
             }
         }
 
         // Switch on the clock
-        i2cSendRegister(SI5351A_I2C_ADDRESS, SI_CLK0_CONTROL+clock, 0x4F | pll_clock);
+        i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_CONTROL+clock, 0x4F | pll_clock);
 
         // If we are setting clock 0 then we need to also set the multisynth divider for
         // clock 1 because it also uses PLL A
@@ -621,7 +621,7 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
 	    {
     	    // Reset the PLLs. This causes a glitch in the output. For small changes to
     	    // the parameters, you don't need to reset the PLL, and there is no glitch
-    	    i2cSendRegister(SI5351A_I2C_ADDRESS, SI_PLL_RESET, pll_reset);
+    	    i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_PLL_RESET, pll_reset);
 
     	    prevDivider[clock] = a;
 	    }
@@ -679,9 +679,8 @@ bool oscInit( void )
 	    si5351aOutputOff(SI_CLK2_CONTROL);
 
         // Set the crystal load capacitance
-        i2cSendRegister( SI5351A_I2C_ADDRESS, SI_XTAL_LOAD, SI_XTAL_LOAD_CAP );
+        i2cWriteRegister( SI5351A_I2C_ADDRESS, SI_XTAL_LOAD, SI_XTAL_LOAD_CAP );
 
         return true;
     }
 }
-

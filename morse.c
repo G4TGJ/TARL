@@ -641,7 +641,7 @@ void morseSetWpm( uint8_t wpm )
     }
 }
 
-void morseConfigure()
+void morseInit()
 {
 }
 

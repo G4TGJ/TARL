@@ -1,6 +1,6 @@
 /** \file cat.h
  *
- * \Author Richard Tomlinson G4TGJ
+ * \author Richard Tomlinson G4TGJ
  */ 
 
 
@@ -11,7 +11,7 @@
 
 /// Initialise the I2C driver.
 ///
-/// Must be called before any other I2C functions
+/// Must be called before any other I2C functions.
 void i2cInit();
 
 /// Write to an 8 bit register over I2C.
@@ -19,7 +19,7 @@ void i2cInit();
 /// @param[in] addr I2C address
 /// @param[in] reg Register address
 /// @param[in] data Data to write to register
-uint8_t i2cSendRegister(uint8_t addr, uint8_t reg, uint8_t data);
+uint8_t i2cWriteRegister(uint8_t addr, uint8_t reg, uint8_t data);
 
 /// Read from an 8 bit register over I2C.
 ///

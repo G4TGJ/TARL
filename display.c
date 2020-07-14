@@ -87,23 +87,23 @@ void displayText( uint8_t line, char *text, bool bReplace )
         }
 #endif
         // Move to the start of the line and print the buffer
-        lcd_setCursor( 0, line );
-        lcd_print( pBuf );
+        lcdSetCursor( 0, line );
+        lcdPrint( pBuf );
         
         // Put the cursor back to where it was
-        lcd_setCursor( cursorCol, cursorLine );
+        lcdSetCursor( cursorCol, cursorLine );
     }
 }
 
-void displayConfigure()
+void displayInit()
 {
-    lcd_init();
+    lcdInit();
 
 	// Set up the LCD's number of columns and rows:
-	lcd_begin(LCD_WIDTH, LCD_HEIGHT, LCD_5x8DOTS);
+	lcdBegin(LCD_WIDTH, LCD_HEIGHT);
 	
     // No scrolling and no cursor
-	lcd_noAutoscroll();
+	lcdAutoscrollOff();
 	displayCursor(0, 0, cursorOff);
 
 	// Initialise all line buffers with spaces
@@ -122,24 +122,24 @@ void displayCursor( uint8_t col, uint8_t line, enum eCursorState state )
     cursorLine = line;
     
     // Move the cursor
-    lcd_setCursor( col, line );
+    lcdSetCursor( col, line );
     
     // Set it off, underlined or blinking
     switch( state )
     {
         case cursorOff:
-            lcd_noCursor();
-            lcd_noBlink();
+            lcdCursorOff();
+            lcdBlinkOff();
             break;
             
         case cursorUnderline:
-            lcd_cursor();
-            lcd_noBlink();
+            lcdCcursorOn();
+            lcdBlinkOff();
             break;
             
         case cursorBlink:
-            lcd_cursor();
-            lcd_blink();
+            lcdCcursorOn();
+            lcdBlinkOn();
             break;
     }
 }

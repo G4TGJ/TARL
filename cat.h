@@ -1,8 +1,7 @@
-/*
- * cat.h
+/** \file cat.h
  *
- * Created: 31/01/2020 14:09:09
- * Author : Richard Tomlinson G4TGJ
+ * \date 31/01/2020 14:09:09
+ * \author Richard Tomlinson G4TGJ
  */ 
 
 

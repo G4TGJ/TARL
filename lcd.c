@@ -7,6 +7,43 @@
 #include "lcd.h"
 #include "millis.h"
 
+// commands
+#define LCD_CLEARDISPLAY 0x01
+#define LCD_RETURNHOME 0x02
+#define LCD_ENTRYMODESET 0x04
+#define LCD_DISPLAYCONTROL 0x08
+#define LCD_CURSORSHIFT 0x10
+#define LCD_FUNCTIONSET 0x20
+#define LCD_SETCGRAMADDR 0x40
+#define LCD_SETDDRAMADDR 0x80
+
+// flags for display entry mode
+#define LCD_ENTRYRIGHT 0x00
+#define LCD_ENTRYLEFT 0x02
+#define LCD_ENTRYSHIFTINCREMENT 0x01
+#define LCD_ENTRYSHIFTDECREMENT 0x00
+
+// flags for display on/off control
+#define LCD_DISPLAYON 0x04
+#define LCD_DISPLAYOFF 0x00
+#define LCD_CURSORON 0x02
+#define LCD_CURSOROFF 0x00
+#define LCD_BLINKON 0x01
+#define LCD_BLINKOFF 0x00
+
+// flags for display/cursor shift
+#define LCD_DISPLAYMOVE 0x08
+#define LCD_CURSORMOVE 0x00
+#define LCD_MOVERIGHT 0x04
+#define LCD_MOVELEFT 0x00
+
+// flags for function set
+#define LCD_8BITMODE 0x10
+#define LCD_4BITMODE 0x00
+#define LCD_2LINE 0x08
+#define LCD_1LINE 0x00
+#define LCD_5x10DOTS 0x04
+#define LCD_5x8DOTS 0x00
 
 #define DISPLAY_FUNCTION  (LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS | LCD_2LINE)
 
@@ -35,15 +72,23 @@ static inline void command(uint8_t value);
 //    S = 0; No shift
 //
 
-void lcd_init()
+void lcdInit()
 {
     // Initialise the LCD interface e.g. I2C
     lcdIFInit();
 
-    lcd_begin(16, 1, LCD_5x8DOTS);
+    lcdBegin(16, 1);
 }
 
-void lcd_begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
+static void lcd_setRowOffsets(int row0, int row1, int row2, int row3)
+{
+    _row_offsets[0] = row0;
+    _row_offsets[1] = row1;
+    _row_offsets[2] = row2;
+    _row_offsets[3] = row3;
+}
+
+void lcdBegin(uint8_t cols, uint8_t lines)
 {
     _numlines = lines;
 
@@ -84,10 +129,10 @@ void lcd_begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
 
     // turn the display on with no cursor or blinking default
     _displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
-    lcd_display();
+    lcdDisplayOn();
 
     // clear it off
-    lcd_clear();
+    lcdClear();
 
     // Initialize to default text direction (for romance languages)
     _displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
@@ -95,28 +140,20 @@ void lcd_begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
-void lcd_setRowOffsets(int row0, int row1, int row2, int row3)
-{
-    _row_offsets[0] = row0;
-    _row_offsets[1] = row1;
-    _row_offsets[2] = row2;
-    _row_offsets[3] = row3;
-}
-
 /********** high level commands, for the user! */
-void lcd_clear()
+void lcdClear()
 {
     command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
     delayMicroseconds(2000);  // this command takes a long time!
 }
 
-void lcd_home()
+void lcdHome()
 {
     command(LCD_RETURNHOME);  // set cursor position to zero
     delayMicroseconds(2000);  // this command takes a long time!
 }
 
-void lcd_setCursor(uint8_t col, uint8_t row)
+void lcdSetCursor(uint8_t col, uint8_t row)
 {
     const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets);
     if ( row >= max_lines )
@@ -132,74 +169,74 @@ void lcd_setCursor(uint8_t col, uint8_t row)
 }
 
 // Turn the display on/off (quickly)
-void lcd_noDisplay()
+void lcdDisplayOff()
 {
     _displaycontrol &= ~LCD_DISPLAYON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void lcd_display()
+void lcdDisplayOn()
 {
     _displaycontrol |= LCD_DISPLAYON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // Turns the underline cursor on/off
-void lcd_noCursor()
+void lcdCursorOff()
 {
     _displaycontrol &= ~LCD_CURSORON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void lcd_cursor()
+void lcdCcursorOn()
 {
     _displaycontrol |= LCD_CURSORON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // Turn on and off the blinking cursor
-void lcd_noBlink()
+void lcdBlinkOff()
 {
     _displaycontrol &= ~LCD_BLINKON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void lcd_blink()
+void lcdBlinkOn()
 {
     _displaycontrol |= LCD_BLINKON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // These commands scroll the display without changing the RAM
-void lcd_scrollDisplayLeft(void)
+void lcdScrollDisplayLeft(void)
 {
     command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
 }
-void lcd_scrollDisplayRight(void)
+void lcdScrollDisplayRight(void)
 {
     command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
 }
 
 // This is for text that flows Left to Right
-void lcd_leftToRight(void)
+void lcdScrollLeftToRight(void)
 {
     _displaymode |= LCD_ENTRYLEFT;
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This is for text that flows Right to Left
-void lcd_rightToLeft(void)
+void lcdScrollRightToLeft(void)
 {
     _displaymode &= ~LCD_ENTRYLEFT;
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This will 'right justify' text from the cursor
-void lcd_autoscroll(void)
+void lcdAutoscrollOn(void)
 {
     _displaymode |= LCD_ENTRYSHIFTINCREMENT;
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This will 'left justify' text from the cursor
-void lcd_noAutoscroll(void)
+void lcdAutoscrollOff(void)
 {
     _displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
     command(LCD_ENTRYMODESET | _displaymode);
@@ -258,7 +295,7 @@ static void send(uint8_t value, uint8_t mode)
     write4bits(value);
 }
 
-void lcd_print( const char *string )
+void lcdPrint( const char *string )
 {
     for( int i = 0 ; i < strlen(string) ; i++ )
     {

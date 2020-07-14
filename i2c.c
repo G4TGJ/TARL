@@ -78,7 +78,7 @@ static uint8_t i2cByteRead()
 	}
 }
 
-uint8_t i2cSendRegister(uint8_t addr, uint8_t reg, uint8_t data)
+uint8_t i2cWriteRegister(uint8_t addr, uint8_t reg, uint8_t data)
 {
 	uint8_t stts;
 	

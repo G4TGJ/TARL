@@ -189,7 +189,7 @@ void i2cInit()
     USI_TWI_Master_Initialise();
 }
 
-uint8_t i2cSendRegister(uint8_t addr, uint8_t reg, uint8_t data)
+uint8_t i2cWriteRegister(uint8_t addr, uint8_t reg, uint8_t data)
 {
     USI_TWI_Start();
     USI_TWI_Write( (addr << TWI_ADR_BITS) | (0 << TWI_READ_BIT) );

@@ -1,8 +1,7 @@
-/*
- * morse.h
+/** \file morse.h
  *
- * Created: 11/09/2019
- * Author : Richard Tomlinson G4TGJ
+ *  \date 11/09/2019
+ *  \author Richard Tomlinson G4TGJ
  */ 
 
 #ifndef MORSE_H
@@ -10,7 +9,7 @@
 
 #include <inttypes.h>
 
-// Morse keyer mode
+/// Morse keyer mode
 enum eMorseKeyerMode
 {
     morseKeyerIambicA = 0,
@@ -21,24 +20,50 @@ enum eMorseKeyerMode
 
 // Functions exported by the morse module
 
-// Set up the morse module
-void morseConfigure();
+/// Initialise the morse module.
+void morseInit();
 
-// Get and set the morse speed in wpm
+/// Get the morse speed in words per minute.
+/// 
+/// @return Morse speed in WPM
 uint8_t morseGetWpm();
+
+/// Set the morse speed in words per minute.
+/// 
+/// @param[in] wpm Morse speed in wpm
 void morseSetWpm( uint8_t wpm );
 
-// Scan the dot and dash paddles
+/// Scan the dot and dash paddles.
+/// Called from the main loop.
+//////////////////////////////////////////////////////////////////////////
+/// The return value can be used to decide whether or not to
+/// go into a low power mode - useful for a battery powered keyer without
+/// an off switch.
+/// 
+/// @returns true if active
+/// @returns false if idle
+
 bool morseScanPaddles( void );
 
-// Switch in or out of tune mode i.e. continuous transmission for tuning ATU etc
+/// Switch in or out of tune mode.
+/// i.e. continuous transmission for tuning ATU etc.
+/// 
+/// @param[in] bTune True to set tune mode, False to leave tune mode
 void morseSetTuneMode( bool bTune );
 
-// Returns true if in tune mode
+/// Returns whether or not in tune mode.
+/// 
+/// @return true if in tune mode
 bool morseInTuneMode();
 
-// Set and get the keyer mode
+/// Set the keyer mode.
+/// 
+/// @param[in] eMorseKeyerMode The keyer mode
 void morseSetKeyerMode( enum eMorseKeyerMode );
+
+/// Get the keyer mode.
+///
+/// @return The keyer mode
 enum eMorseKeyerMode morseGetKeyerMode();
 
 #endif //MORSE_H
