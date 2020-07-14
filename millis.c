@@ -69,7 +69,7 @@ void delay( uint16_t ms )
 }
 
 // Initialise the timer
-void setup_millis(void)
+void millisInit(void)
 {
 #ifdef OCR1AH
     // 16 bit timer
