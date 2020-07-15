@@ -39,7 +39,7 @@ void oscClockEnable( uint8_t clock, bool bEnable );
 
 /// Set the crystal frequency.
 ///
-/// @param[in] frequency Crystal frequency (in hertz)
+/// @param[in] xtal_freq Crystal frequency (in hertz)
 void oscSetXtalFrequency( uint32_t xtal_freq );
 
 #endif //OSC_H
