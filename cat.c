@@ -108,7 +108,7 @@ static bool catInformation( char *cmdText, int len )
         // Write the information into the reply
         sprintf( cmdText, "IF000%08lu%c%04u%u%u%c00000;", getCurrentVFOFreq(),
                                                          ((getCurrentVFOOffset() >= 0) ? '+' : '-'),
-                                                         getCurrentVFOOffset(),
+                                                         ((getCurrentVFOOffset() >= 0) ? getCurrentVFOOffset() : -getCurrentVFOOffset()),
                                                          getCurrentVFORIT(),
                                                          getCurrentVFOXIT(),
                                                          getModeChar()
@@ -135,7 +135,7 @@ static bool catOppositeInformation( char *cmdText, int len )
         // Write the information into the reply
         sprintf( cmdText, "IF000%08lu%c%04u%u%u%c00000;", getOtherVFOFreq(),
                                                          ((getOtherVFOOffset() >= 0) ? '+' : '-'),
-                                                         getOtherVFOOffset(),
+                                                         ((getOtherVFOOffset() >= 0) ? getOtherVFOOffset() : -getOtherVFOOffset()),
                                                          getOtherVFORIT(),
                                                          getOtherVFOXIT(),
                                                          getModeChar()
