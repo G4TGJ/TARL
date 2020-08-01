@@ -585,7 +585,7 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
         setupMultisynth(SI_SYNTH_MS_0+(8*firstClock), a, b, c, rDiv[firstClock]);
 
         // Delay needed for it to take changes
-        delay(5);
+        delay(1);
 
         // Set quadrature mode if applicable (only for clock 0 or clock 1)
         if( (clock != 2) && (quadrature != 0) )
@@ -611,7 +611,7 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
         {
             setupMultisynth(SI_SYNTH_MS_1, a1, b1, c1, rDiv[1]);
 
-            delay(5);
+            delay(1);
         }
 
 	    // If the divider has changed then set everything up
