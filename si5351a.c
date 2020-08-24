@@ -459,8 +459,8 @@ static uint8_t getRDiv( uint32_t *pFreq )
 // Set the clock to the given frequency with optional quadrature.
 //
 // quadrature is only used for clock 1 - it is ignored for the others
-// +ve is CLK0 leads CLK1 by 90 degrees
-// -ve is CLK0 lags  CLK1 by 90 degrees
+// +ve is CLK1 leads CLK0 by 90 degrees
+// -ve is CLK1 lags  CLK0 by 90 degrees
 // 0 is no quadrature i.e. set the frequency as normal
 // When quadrature is set for clock 1 then it is set to the same frequency as clock 0
 void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
@@ -592,13 +592,13 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
         {
             if( quadrature > 0)
             {
-                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
-                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, a);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
             }
             else
             {
-                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, a);
-                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
             }
         }
 
