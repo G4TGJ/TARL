@@ -15,7 +15,6 @@
 #include "config.h"
 #include "i2c.h"
 #include "osc.h"
-#include "nvram.h"
 #include "millis.h"
 
 // Register definitions
