@@ -27,10 +27,19 @@ volatile static uint8_t posRXWrite, posRXRead;
 volatile static uint8_t posTXWrite, posTXRead;
 
 // Receive complete interrupt handler
+#ifdef USART0
+ISR(USART0_RXC_vect)
+#else
 ISR (USART_RX_vect)
+#endif
 {
     // Get the serial character into the buffer
+#ifdef USART0
+    uint8_t status = USART0.RXDATAH;
+    serialRXBuf[posRXWrite] = USART0.RXDATAL;
+#else
     serialRXBuf[posRXWrite] = UDR0;
+#endif
 
     // Move to the next write position wrapping if necessary
     posRXWrite = (posRXWrite + 1) % SERIAL_RX_BUF_LEN;
@@ -40,21 +49,33 @@ ISR (USART_RX_vect)
 static void sendData()
 {
     /* Put data into transmit hardware buffer, sends the data */
+#ifdef USART0
+    USART0.TXDATAL = serialTXBuf[posTXRead];
+#else
     UDR0 = serialTXBuf[posTXRead];
+#endif
 
     // Move to the next read position wrapping if necessary
     posTXRead = (posTXRead + 1) % SERIAL_TX_BUF_LEN;
 }
 
 // Transmit data empty interrupt handler
+#ifdef USART0
+ISR(USART0_DRE_vect)
+#else
 ISR (USART_UDRE_vect)
+#endif
 {
     // If the read position is the same as the write position then nothing in
     // the buffer
     if( posTXRead == posTXWrite )
     {
         // Nothing in buffer so disable the interrupt
+#ifdef USART0
+        USART0.CTRLA &= ~USART_DREIE_bm;
+#else
         UCSR0B &= ~(1<<UDRIE0);
+#endif
     }
     else
     {
@@ -64,6 +85,25 @@ ISR (USART_UDRE_vect)
 
 void serialInit( uint32_t baud)
 {
+#ifdef USART0
+    /*Set baud rate */
+    uint16_t ubrr = 4*F_CPU/baud;
+    USART0.BAUDH = (uint8_t)(ubrr>>8);
+    USART0.BAUDL = (uint8_t)ubrr;
+
+    /* Enable receive complete interrupts */
+    USART0.CTRLA = USART_RXCIE_bm;
+    
+    /* Enable receiver and transmitter */
+    USART0.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
+
+    /* Set frame format: 8 data, 1 stop bit */
+    USART0.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc | USART_CHSIZE_8BIT_gc;
+
+    // Enable TXD as output */
+    VPORTB.DIR |= (1<<2);
+
+#else
     /*Set baud rate */
     uint16_t ubrr = F_CPU/16/baud-1;
     UBRR0H = (uint8_t)(ubrr>>8);
@@ -74,6 +114,7 @@ void serialInit( uint32_t baud)
  
     /* Set frame format: 8 data, 1 stop bit */
     UCSR0C = (0<<USBS0)|(3<<UCSZ00);
+#endif
 }
 
 void serialTransmit( uint8_t data )
@@ -87,6 +128,15 @@ void serialTransmit( uint8_t data )
         posTXWrite = (posTXWrite + 1) % SERIAL_TX_BUF_LEN;
 
         // Send the first byte if the transmit hardware buffer is empty
+#ifdef USART0
+        if( USART0.STATUS & USART_DREIF_bm )
+        {
+            sendData();
+
+            // Enable the transmit data empty interrupt
+            USART0.CTRLA |= USART_DREIE_bm;
+        }
+#else
         if( UCSR0A & (1<<UDRE0) )
         {
             sendData();
@@ -94,6 +144,7 @@ void serialTransmit( uint8_t data )
             // Enable the transmit data empty interrupt
             UCSR0B |= (1<<UDRIE0);
         }
+#endif
     }
 }
 
