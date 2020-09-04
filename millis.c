@@ -37,15 +37,29 @@
 #endif
 #endif
 
+#if defined TCA0
+#define CLOCK_DIV 1
+#endif
+
 // Clock is running at fraction of CPU clock
 #define CTC_MATCH_OVERFLOW (F_CPU / CLOCK_DIV / 1000)
 
 volatile uint32_t timer1_ticks;
  
+#if defined TCA0
+ISR(TCA0_OVF_vect)
+{
+    timer1_ticks++;
+
+    /* The interrupt flag has to be cleared manually */
+    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
+}
+#else
 ISR (TIMER1_COMPA_vect)
 {
     timer1_ticks++;
 }
+#endif
 
 // Return the current millisecond tick count
 uint32_t millis ()
@@ -83,7 +97,7 @@ void millisInit(void)
 
     // Enable the compare match interrupt
     TIMSK1 |= (1 << OCIE1A);
-#else
+#elif defined OCR1A
     // 8 bit timer
     // CTC mode
     TCCR1 = (1 << CTC1) | CLOCK_SELECT;
@@ -94,6 +108,19 @@ void millisInit(void)
 
     // Enable the compare match interrupt
     TIMSK |= (1 << OCIE1A);
+#elif defined TCA0
+	TCA0.SINGLE.INTCTRL = 0 << TCA_SINGLE_CMP0_bp   /* Compare 0 Interrupt: disabled */
+	                      | 0 << TCA_SINGLE_CMP1_bp /* Compare 1 Interrupt: disabled */
+	                      | 0 << TCA_SINGLE_CMP2_bp /* Compare 2 Interrupt: disabled */
+	                      | 1 << TCA_SINGLE_OVF_bp; /* Overflow Interrupt: enabled */
+
+	TCA0.SINGLE.PER = CTC_MATCH_OVERFLOW;
+
+	TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc /* System Clock */
+	                    | 1 << TCA_SINGLE_ENABLE_bp /* Module Enable: enabled */;
+
+#else
+    #error No timer support for this chip
 #endif
     
     // Now enable global interrupts
