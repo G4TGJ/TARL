@@ -20,10 +20,8 @@ static char textBuf[LCD_HEIGHT][ LCD_WIDTH + 1];
 // Keep track of the cursor position
 static uint8_t cursorCol, cursorLine;
 
-#ifdef ENABLE_DISPLAY_SPLIT_LINE
 // Split point for the line
 static uint8_t splitPoint[LCD_HEIGHT];
-#endif
 
 // Update the line buffer
 // Text scrolls in from the right unless bReplace is true
@@ -54,18 +52,13 @@ void displayText( uint8_t line, char *text, bool bReplace )
                 {
                     pBuf[i] = text[i];
                 }
-#ifdef ENABLE_DISPLAY_SPLIT_LINE
                 // Only pad with spaces up to the split point, if there is one
                 else if( (i < splitPoint[line]) || (splitPoint[line] == 0) )
-#else
-                else
-#endif
                 {
                     pBuf[i] = ' ';
                 }
             }
         }
-#ifdef ENABLE_DISPLAY_SPLIT_LINE
         else
         {
             // Copy characters over to the text buffer
@@ -85,7 +78,7 @@ void displayText( uint8_t line, char *text, bool bReplace )
                 }
             }
         }
-#endif
+
         // Move to the start of the line and print the buffer
         lcdSetCursor( 0, line );
         lcdPrint( pBuf );
@@ -144,7 +137,6 @@ void displayCursor( uint8_t col, uint8_t line, enum eCursorState state )
     }
 }
 
-#ifdef ENABLE_DISPLAY_SPLIT_LINE
 // Split a line at the given column. This means text will scroll up to that
 // point.
 void displaySplitLine( uint8_t col, uint8_t line )
@@ -154,4 +146,3 @@ void displaySplitLine( uint8_t col, uint8_t line )
         splitPoint[line] = col;
     }
 }
-#endif
