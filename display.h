@@ -34,9 +34,6 @@ void displayText( uint8_t line, char *text, bool bReplace );
 /// @param[in] state cursorOff, cursorUnderline or cursorBlink
 void displayCursor( uint8_t col, uint8_t line, enum eCursorState state );
 
-/// Update the display - called from the loop.
-void displayUpdate();
-
 /// Split a line at the given column. This means text will scroll up to that point.
 ///
 /// @param[in] col Column number
