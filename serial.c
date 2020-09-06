@@ -12,13 +12,9 @@
 #include "config.h"
 
 // Buffer to hold characters received from the serial port
-// Length should be a power of 2 for efficiency
-#define SERIAL_RX_BUF_LEN 32
 volatile static uint8_t serialRXBuf[SERIAL_RX_BUF_LEN];
 
 // Buffer to hold characters to send to the serial port
-// Length should be a power of 2 for efficiency
-#define SERIAL_TX_BUF_LEN 64
 volatile static uint8_t serialTXBuf[SERIAL_TX_BUF_LEN];
 
 // Current write and read positions in the buffer
@@ -35,7 +31,6 @@ ISR (USART_RX_vect)
 {
     // Get the serial character into the buffer
 #ifdef USART0
-    uint8_t status = USART0.RXDATAH;
     serialRXBuf[posRXWrite] = USART0.RXDATAL;
 #else
     serialRXBuf[posRXWrite] = UDR0;
@@ -100,8 +95,14 @@ void serialInit( uint32_t baud)
     /* Set frame format: 8 data, 1 stop bit */
     USART0.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc | USART_CHSIZE_8BIT_gc;
 
-    // Enable TXD as output */
-    VPORTB.DIR |= (1<<2);
+    // Enable TXD as output and RXD as input */
+    SERIAL_DIR_REG |=  (1<<SERIAL_TXD_PIN);
+    SERIAL_DIR_REG &= ~(1<<SERIAL_RXD_PIN);
+
+    // Enable the alternative pins if required
+#ifdef SERIAL_ALTERNATIVE_PINS
+    PORTMUX.CTRLB |= PORTMUX_USART0_bm;
+#endif
 
 #else
     /*Set baud rate */
