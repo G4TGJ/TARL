@@ -1,0 +1,3 @@
+- name: Build
+  service: app
+  command: ./FreqGen5351/FreqGen5351/build.sh
