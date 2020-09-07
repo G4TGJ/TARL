@@ -1,3 +1,3 @@
 - name: Build
   service: app
-  command: ls -al home
+  command: /bin/sh -c 'cd FreqGen5351/FreqGen5351 && ./build.sh'
