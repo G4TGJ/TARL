@@ -40,6 +40,8 @@ void readRotary( bool *pbCW, bool *pbCCW, bool *pbShortPress, bool *pbLongPress 
         // Start by assuming nothing pressed
         *pbCW = false;
         *pbCCW = false;
+        *pbShortPress = false;
+        *pbLongPress = false;
 
         // Read the rotary control
         ioReadRotary( &bRotaryA, &bRotaryB, &bRotarySw );
@@ -83,9 +85,10 @@ void readRotary( bool *pbCW, bool *pbCCW, bool *pbShortPress, bool *pbLongPress 
                 INVALID,
                 CCW,
                 CW,
-            INVALID};
+                INVALID
+            };
 
-            // Keep track of the transition
+            // Keep track of the transitions
             static uint8_t transition;
 
             // The previous direction - need enough transitions in the same direction
