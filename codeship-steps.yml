@@ -1,9 +1,6 @@
 - name: FreqGen5351
   service: app
   command: /bin/sh -c 'cd FreqGen5351/FreqGen5351 && ./build.sh'
-- name: Serial817
-  service: app
-  command: /bin/sh -c 'cd Serial817/Serial817 && ./build.sh'
 - name: TATC
   service: app
   command: /bin/sh -c 'cd TATC/TATC && ./build.sh'
