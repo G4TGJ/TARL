@@ -6,4 +6,6 @@ non-radio systems.
 
 They provide CAT control, display, EEPROM, I2C, LCD, millisecond timer, morse keyer, oscillator (si5351a), pushbutton, rotary control and serial support.
 
+They should work on most 8-bit AVR processors including the ATmega, ATtiny and tinyAVR 1-series.
+
 See [TARL documentation](https://g4tgj.github.io/TARLdocs) for how to use the library.
