@@ -69,188 +69,188 @@ enum eMorseKeyerMode morseGetKeyerMode()
 // 0b01 is a dot
 static char* morseChar( unsigned int character )
 {
-	char* morse;
-	
-	switch( character )
-	{
-		case 0b0110:
-			morse = "a";
-			break;
-			
-		case 0b10010101:
-			morse = "b";
-			break;
-		
-		case 0b10011001:
-			morse = "c";
-			break;
-		
-		case 0b100101:
-			morse = "d";
-			break;
-		
-		case 0b01:
-			morse = "e";
-			break;
-		
-		case 0b01011001:
-			morse = "f";
-			break;
-		
-		case 0b101001:
-			morse = "g";
-			break;
-		
-		case 0b01010101:
-			morse = "h";
-			break;
-		
-		case 0b0101:
-		    morse = "i";
-		    break;
-		
-		case 0b01101010:
-		    morse = "j";
-		    break;
-		
-		case 0b100110:
-		    morse = "k";
-		    break;
-		
-		case 0b01100101:
-		    morse = "l";
-		    break;
-		
-		case 0b1010:
-		    morse = "m";
-		    break;
-		
-		case 0b1001:
-		    morse = "n";
-		    break;
-		
-		case 0b101010:
-		    morse = "o";
-		    break;
-		
-		case 0b01101001:
-		    morse = "p";
-		    break;
-		
-		case 0b10100110:
-			morse = "q";
-			break;
-		
-		case 0b011001:
-			morse = "r";
-			break;
-		
-		case 0b010101:
-			morse = "s";
-			break;
-		
-		case 0b10:
-			morse = "t";
-			break;
-		
-		case 0b010110:
-			morse = "u";
-			break;
-		
-		case 0b01010110:
-			morse = "v";
-			break;
-		
-		case 0b011010:
-			morse = "w";
-			break;
-		
-		case 0b10010110:
-			morse = "x";
-			break;
-		
-		case 0b10011010:
-			morse = "y";
-			break;
-		
-		case 0b10100101:
-			morse = "z";
-			break;
-		
-		case 0b0110101010:
-			morse = "1";
-			break;
-		
-		case 0b0101101010:
-			morse = "2";
-			break;
-		
-		case 0b0101011010:
-			morse = "3";
-			break;
-		
-		case 0b0101010110:
-			morse = "4";
-			break;
-		
-		case 0b0101010101:
-			morse = "5";
-			break;
-		
-		case 0b1001010101:
-			morse = "6";
-			break;
-		
-		case 0b1010010101:
-			morse = "7";
-			break;
-		
-		case 0b1010100101:
-			morse = "8";
-			break;
-		
-		case 0b1010101001:
-			morse = "9";
-			break;
-		
-		case 0b1010101010:
-			morse = "0";
-			break;
-		
-		case 0b010110100101:
-			morse = "?";
-			break;
-		
-		case 0b1001010110:
-			morse = "=";
-			break;
-		
-		case 0b011001100110:
-			morse = ".";
-			break;
-		
-		case 0b101001011010:
-			morse = ",";
-			break;
-		
-		case 0b0110011001:
-			morse = "ar";
-			break;
-		
-		case 0b010101100110:
-			morse = "sk";
-			break;
-		
-		case 0b1001101001:
-			morse = "kn";
-			break;
-		
-		default:
-			morse = "|";
-			break;
-	}
-	
-	return morse;
+    char* morse;
+    
+    switch( character )
+    {
+        case 0b0110:
+            morse = "a";
+            break;
+            
+        case 0b10010101:
+            morse = "b";
+            break;
+        
+        case 0b10011001:
+            morse = "c";
+            break;
+        
+        case 0b100101:
+            morse = "d";
+            break;
+        
+        case 0b01:
+            morse = "e";
+            break;
+        
+        case 0b01011001:
+            morse = "f";
+            break;
+        
+        case 0b101001:
+            morse = "g";
+            break;
+        
+        case 0b01010101:
+            morse = "h";
+            break;
+        
+        case 0b0101:
+            morse = "i";
+            break;
+        
+        case 0b01101010:
+            morse = "j";
+            break;
+        
+        case 0b100110:
+            morse = "k";
+            break;
+        
+        case 0b01100101:
+            morse = "l";
+            break;
+        
+        case 0b1010:
+            morse = "m";
+            break;
+        
+        case 0b1001:
+            morse = "n";
+            break;
+        
+        case 0b101010:
+            morse = "o";
+            break;
+        
+        case 0b01101001:
+            morse = "p";
+            break;
+        
+        case 0b10100110:
+            morse = "q";
+            break;
+        
+        case 0b011001:
+            morse = "r";
+            break;
+        
+        case 0b010101:
+            morse = "s";
+            break;
+        
+        case 0b10:
+            morse = "t";
+            break;
+        
+        case 0b010110:
+            morse = "u";
+            break;
+        
+        case 0b01010110:
+            morse = "v";
+            break;
+        
+        case 0b011010:
+            morse = "w";
+            break;
+        
+        case 0b10010110:
+            morse = "x";
+            break;
+        
+        case 0b10011010:
+            morse = "y";
+            break;
+        
+        case 0b10100101:
+            morse = "z";
+            break;
+        
+        case 0b0110101010:
+            morse = "1";
+            break;
+        
+        case 0b0101101010:
+            morse = "2";
+            break;
+        
+        case 0b0101011010:
+            morse = "3";
+            break;
+        
+        case 0b0101010110:
+            morse = "4";
+            break;
+        
+        case 0b0101010101:
+            morse = "5";
+            break;
+        
+        case 0b1001010101:
+            morse = "6";
+            break;
+        
+        case 0b1010010101:
+            morse = "7";
+            break;
+        
+        case 0b1010100101:
+            morse = "8";
+            break;
+        
+        case 0b1010101001:
+            morse = "9";
+            break;
+        
+        case 0b1010101010:
+            morse = "0";
+            break;
+        
+        case 0b010110100101:
+            morse = "?";
+            break;
+        
+        case 0b1001010110:
+            morse = "=";
+            break;
+        
+        case 0b011001100110:
+            morse = ".";
+            break;
+        
+        case 0b101001011010:
+            morse = ",";
+            break;
+        
+        case 0b0110011001:
+            morse = "ar";
+            break;
+        
+        case 0b010101100110:
+            morse = "sk";
+            break;
+        
+        case 0b1001101001:
+            morse = "kn";
+            break;
+        
+        default:
+            morse = "|";
+            break;
+    }
+    
+    return morse;
 }
 
 // Current character state
@@ -359,13 +359,13 @@ static bool dashPaddlePressed( bool dashPressed )
 // Returns true if active, false if idle
 bool morseScanPaddles( void )
 {
-	// To keep track of the length of a gap so we know when a character or word finishes
-	// Start with the max possible so it doesn't start yet
-	static unsigned long charGapStartTime = ULONG_MAX;
-	static unsigned long wordGapStartTime = ULONG_MAX;
-	
-	// Time of next scan
-	static unsigned long nextScan;
+    // To keep track of the length of a gap so we know when a character or word finishes
+    // Start with the max possible so it doesn't start yet
+    static unsigned long charGapStartTime = ULONG_MAX;
+    static unsigned long wordGapStartTime = ULONG_MAX;
+    
+    // Time of next scan
+    static unsigned long nextScan;
 
     // The time we have already waited after a dot or dash
     static int delayAlready;
@@ -444,41 +444,41 @@ bool morseScanPaddles( void )
                 dashPressedEarly = true;
             }
         }
-	
-	    // See if we should scan for a paddle press
-	    unsigned long currentTime = millis();
-	    if( currentTime > nextScan )
-	    {
+    
+        // See if we should scan for a paddle press
+        unsigned long currentTime = millis();
+        if( currentTime > nextScan )
+        {
             switch( morseState )
-	        {
-		        case sendingDot:
-		        case sendingDash:
-			        // If currently sending a dot or dash then now in a gap which is one dot long
+            {
+                case sendingDot:
+                case sendingDash:
+                    // If currently sending a dot or dash then now in a gap which is one dot long
                     // But we split this in case the paddle is pressed early
                     keyDown( false );
-			        morseState = firstGap;
+                    morseState = firstGap;
                     requiredDelay = delayAlready = dotLen / 3;
 
-			        // Note the time when the gap started
-			        charGapStartTime = currentTime;
+                    // Note the time when the gap started
+                    charGapStartTime = currentTime;
 
                     // Prevent word gap from starting just yet
-            	    wordGapStartTime = ULONG_MAX;
-			        break;
+                    wordGapStartTime = ULONG_MAX;
+                    break;
 
-		        case firstGap:
+                case firstGap:
                     // Wait the rest of the gap
                     // This means we will note the state early
-			        morseState = secondGap;
+                    morseState = secondGap;
 
                     // Calculate the remainder of the gap (allows for integer truncation)
-			        requiredDelay = dotLen - delayAlready;
-			        break;
+                    requiredDelay = dotLen - delayAlready;
+                    break;
 
                 case secondGap:
-			        // The gap is over so can now go idle
-			        morseState = idle;
-			        requiredDelay = 0;
+                    // The gap is over so can now go idle
+                    morseState = idle;
+                    requiredDelay = 0;
                     
                     // If we are in iambic B mode then may need to add an additional
                     // dot or dash
@@ -504,12 +504,12 @@ bool morseScanPaddles( void )
                     }
                     
                     bSqueezed = false;
-			        break;
+                    break;
 
-		        case idle:
-			        // Not currently sending anything
+                case idle:
+                    // Not currently sending anything
                     // Has a paddle been pressed?
-			        if( dotPressed || dotPressedEarly || dashPressed || dashPressedEarly )
+                    if( dotPressed || dotPressedEarly || dashPressed || dashPressedEarly )
                     {
                         // Which paddle we look at first depends on the keyer mode
                         bool bDotFirst = true;
@@ -555,49 +555,49 @@ bool morseScanPaddles( void )
                         
                         // Clear dot and dash memories
                         dotPressedEarly = dashPressedEarly = false;
-			        }
-			        else
-			        {
+                    }
+                    else
+                    {
                         // Nothing pressed so reset the paddle state
                         firstPaddle = currentPaddle = paddleNone;
                         
-				        // If the gap since the previous character is long enough then character is over
-				        if( (charGapStartTime != ULONG_MAX) &&
-				            (currentTime - charGapStartTime) >= (CHARACTER_GAP_LEN * dotLen) )
-				        {
-					        // Now the character is complete look it up
-					        displayMorse(morseChar(charState));
-					
-					        // Start the character again
-					        charState = 0;
-					
-					        // Don't display this character again
-					        charGapStartTime = ULONG_MAX;
+                        // If the gap since the previous character is long enough then character is over
+                        if( (charGapStartTime != ULONG_MAX) &&
+                            (currentTime - charGapStartTime) >= (CHARACTER_GAP_LEN * dotLen) )
+                        {
+                            // Now the character is complete look it up
+                            displayMorse(morseChar(charState));
+                    
+                            // Start the character again
+                            charState = 0;
+                    
+                            // Don't display this character again
+                            charGapStartTime = ULONG_MAX;
 
                             // Now the character has finished we can start timing the word gap
                             wordGapStartTime = currentTime;
-				        }
-			        }
-			        break;
-		        default:
-			        // Should never get here!
-			        break;
-	        }
-	
+                        }
+                    }
+                    break;
+                default:
+                    // Should never get here!
+                    break;
+            }
+    
             // Time of the next scan
             nextScan = currentTime + requiredDelay;
         }
 
-	    // If the gap since the previous character is long enough then word is over
-	    if( (morseState == idle) &&
+        // If the gap since the previous character is long enough then word is over
+        if( (morseState == idle) &&
             (wordGapStartTime != ULONG_MAX) &&
-	        ((currentTime - wordGapStartTime) >= (WORD_GAP_LEN * dotLen)) )
-	    {
-    	    displayMorse(" ");
-    				    
-    	    // Don't display this gap character again
-    	    wordGapStartTime = ULONG_MAX;
-	    }
+            ((currentTime - wordGapStartTime) >= (WORD_GAP_LEN * dotLen)) )
+        {
+            displayMorse(" ");
+                        
+            // Don't display this gap character again
+            wordGapStartTime = ULONG_MAX;
+        }
     }
 
     // Return true if not idle

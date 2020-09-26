@@ -109,15 +109,15 @@ void millisInit(void)
     // Enable the compare match interrupt
     TIMSK |= (1 << OCIE1A);
 #elif defined TCA0
-	TCA0.SINGLE.INTCTRL = 0 << TCA_SINGLE_CMP0_bp   /* Compare 0 Interrupt: disabled */
-	                      | 0 << TCA_SINGLE_CMP1_bp /* Compare 1 Interrupt: disabled */
-	                      | 0 << TCA_SINGLE_CMP2_bp /* Compare 2 Interrupt: disabled */
-	                      | 1 << TCA_SINGLE_OVF_bp; /* Overflow Interrupt: enabled */
+    TCA0.SINGLE.INTCTRL = 0 << TCA_SINGLE_CMP0_bp /* Compare 0 Interrupt: disabled */
+                        | 0 << TCA_SINGLE_CMP1_bp /* Compare 1 Interrupt: disabled */
+                        | 0 << TCA_SINGLE_CMP2_bp /* Compare 2 Interrupt: disabled */
+                        | 1 << TCA_SINGLE_OVF_bp; /* Overflow Interrupt: enabled */
 
-	TCA0.SINGLE.PER = CTC_MATCH_OVERFLOW;
+    TCA0.SINGLE.PER = CTC_MATCH_OVERFLOW;
 
-	TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc /* System Clock */
-	                    | 1 << TCA_SINGLE_ENABLE_bp /* Module Enable: enabled */;
+    TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc /* System Clock */
+                        | 1 << TCA_SINGLE_ENABLE_bp /* Module Enable: enabled */;
 
 #else
     #error No timer support for this chip

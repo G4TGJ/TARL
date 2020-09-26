@@ -48,19 +48,19 @@
 ---------------------------------------------------------------*/
 static void USI_TWI_Master_Initialise(void)
 {
-	PORT_USI |= (1 << PIN_USI_SDA); // Enable pullup on SDA, to set high as released state.
-	PORT_USI |= (1 << PIN_USI_SCL); // Enable pullup on SCL, to set high as released state.
+    PORT_USI |= (1 << PIN_USI_SDA); // Enable pullup on SDA, to set high as released state.
+    PORT_USI |= (1 << PIN_USI_SCL); // Enable pullup on SCL, to set high as released state.
 
-	DDR_USI |= (1 << PIN_USI_SCL); // Enable SCL as output.
-	DDR_USI |= (1 << PIN_USI_SDA); // Enable SDA as output.
+    DDR_USI |= (1 << PIN_USI_SCL); // Enable SCL as output.
+    DDR_USI |= (1 << PIN_USI_SDA); // Enable SDA as output.
 
-	USIDR = 0xFF;                                           // Preload dataregister with "released level" data.
-	USICR = (0 << USISIE) | (0 << USIOIE) |                 // Disable Interrupts.
-	        (1 << USIWM1) | (0 << USIWM0) |                 // Set USI in Two-wire mode.
-	        (1 << USICS1) | (0 << USICS0) | (1 << USICLK) | // Software stobe as counter clock source
-	        (0 << USITC);
-	USISR = (1 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) | // Clear flags,
-	        (0x0 << USICNT0);                                             // and reset counter.
+    USIDR = 0xFF;                                           // Preload dataregister with "released level" data.
+    USICR = (0 << USISIE) | (0 << USIOIE) |                 // Disable Interrupts.
+            (1 << USIWM1) | (0 << USIWM0) |                 // Set USI in Two-wire mode.
+            (1 << USICS1) | (0 << USICS0) | (1 << USICLK) | // Software stobe as counter clock source
+            (0 << USITC);
+    USISR = (1 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) | // Clear flags,
+            (0x0 << USICNT0);                                             // and reset counter.
 }
 
 /*---------------------------------------------------------------
@@ -70,63 +70,63 @@ static void USI_TWI_Master_Initialise(void)
 ---------------------------------------------------------------*/
 static uint8_t USI_TWI_Master_Transfer(uint8_t data)
 {
-	USISR = data;                                          // Set USISR according to temp.
-	                                                       // Prepare clocking.
-	data = (0 << USISIE) | (0 << USIOIE) |                 // Interrupts disabled
-	       (1 << USIWM1) | (0 << USIWM0) |                 // Set USI in Two-wire mode.
-	       (1 << USICS1) | (0 << USICS0) | (1 << USICLK) | // Software clock strobe as source.
-	       (1 << USITC);                                   // Toggle Clock Port.
-	do
+    USISR = data;                                          // Set USISR according to temp.
+                                                           // Prepare clocking.
+    data = (0 << USISIE) | (0 << USIOIE) |                 // Interrupts disabled
+           (1 << USIWM1) | (0 << USIWM0) |                 // Set USI in Two-wire mode.
+           (1 << USICS1) | (0 << USICS0) | (1 << USICLK) | // Software clock strobe as source.
+           (1 << USITC);                                   // Toggle Clock Port.
+    do
     {
-		DELAY_T2TWI;
+        DELAY_T2TWI;
 
         // Generate positve SCL edge.
-		USICR = data;
+        USICR = data;
 
-		// Wait for SCL to go high.
-		while (!(PIN_USI & (1 << PIN_USI_SCL)));
+        // Wait for SCL to go high.
+        while (!(PIN_USI & (1 << PIN_USI_SCL)));
 
-		DELAY_T4TWI;
+        DELAY_T4TWI;
 
         // Generate negative SCL edge.
-		USICR = data;
-	} while (!(USISR & (1 << USIOIF))); // Check for transfer complete.
+        USICR = data;
+    } while (!(USISR & (1 << USIOIF))); // Check for transfer complete.
 
-	DELAY_T2TWI;
+    DELAY_T2TWI;
 
     // Read out data.
-	data = USIDR;
+    data = USIDR;
 
     // Release SDA.
-	USIDR = 0xFF;
+    USIDR = 0xFF;
 
      // Enable SDA as output.
-	DDR_USI |= (1 << PIN_USI_SDA);
+    DDR_USI |= (1 << PIN_USI_SDA);
 
      // Return the data from the USIDR
-	return data;
+    return data;
 }
 
 static void USI_TWI_Start()
 {
-	// Release SCL to ensure that (repeated) Start can be performed
-	PORT_USI |= (1 << PIN_USI_SCL);
+    // Release SCL to ensure that (repeated) Start can be performed
+    PORT_USI |= (1 << PIN_USI_SCL);
 
     // Verify that SCL becomes high.
-	while (!(PIN_USI & (1 << PIN_USI_SCL)));
+    while (!(PIN_USI & (1 << PIN_USI_SCL)));
 
-	DELAY_T2TWI;
+    DELAY_T2TWI;
 
-	// Generate Start Condition Force SDA LOW.
-	PORT_USI &= ~(1 << PIN_USI_SDA);
+    // Generate Start Condition Force SDA LOW.
+    PORT_USI &= ~(1 << PIN_USI_SDA);
 
-	DELAY_T4TWI;
+    DELAY_T4TWI;
 
     // Pull SCL LOW.
-	PORT_USI &= ~(1 << PIN_USI_SCL);
+    PORT_USI &= ~(1 << PIN_USI_SCL);
 
     // Release SDA.
-	PORT_USI |= (1 << PIN_USI_SDA);
+    PORT_USI |= (1 << PIN_USI_SDA);
 }
 
 static void USI_TWI_Read( uint8_t *pData)
@@ -145,17 +145,17 @@ static void USI_TWI_Read( uint8_t *pData)
 static void USI_TWI_Write( uint8_t data)
 {
     // Pull SCL LOW.
-	PORT_USI &= ~(1 << PIN_USI_SCL);
+    PORT_USI &= ~(1 << PIN_USI_SCL);
 
     // Setup data.
-	USIDR = data;
+    USIDR = data;
 
     // Send 8 bits on bus.
-	USI_TWI_Master_Transfer(USISR_8bit);
+    USI_TWI_Master_Transfer(USISR_8bit);
 
-	/* Clock and verify (N)ACK from slave */
-	DDR_USI &= ~(1 << PIN_USI_SDA); // Enable SDA as input.
-	USI_TWI_Master_Transfer(USISR_1bit);
+    /* Clock and verify (N)ACK from slave */
+    DDR_USI &= ~(1 << PIN_USI_SDA); // Enable SDA as input.
+    USI_TWI_Master_Transfer(USISR_1bit);
 }
 
 
@@ -166,22 +166,22 @@ static void USI_TWI_Write( uint8_t data)
 static uint8_t USI_TWI_Master_Stop(void)
 {
     // Pull SDA low.
-	PORT_USI &= ~(1 << PIN_USI_SDA);
+    PORT_USI &= ~(1 << PIN_USI_SDA);
 
     // Release SCL.
-	PORT_USI |= (1 << PIN_USI_SCL);
+    PORT_USI |= (1 << PIN_USI_SCL);
 
-	// Wait for SCL to go high.
-	while (!(PIN_USI & (1 << PIN_USI_SCL)));
+    // Wait for SCL to go high.
+    while (!(PIN_USI & (1 << PIN_USI_SCL)));
 
-	DELAY_T4TWI;
+    DELAY_T4TWI;
 
      // Release SDA.
-	PORT_USI |= (1 << PIN_USI_SDA);
+    PORT_USI |= (1 << PIN_USI_SDA);
 
-	DELAY_T2TWI;
+    DELAY_T2TWI;
 
-	return (true);
+    return (true);
 }
 
 void i2cInit()

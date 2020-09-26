@@ -34,11 +34,11 @@ void displayText( uint8_t line, char *text, bool bReplace )
     // With no scrolling we just display the text on the line
     char *pBuf = text;
 #else
-	// Number of chars in new string
-	uint8_t newLen = strlen( text );
-	
-	// Buffer pointer
-	char *pBuf = textBuf[line];
+    // Number of chars in new string
+    uint8_t newLen = strlen( text );
+    
+    // Buffer pointer
+    char *pBuf = textBuf[line];
 
     // Ensure the text length is not longer than the line
     if(newLen > LCD_WIDTH)
@@ -100,15 +100,15 @@ void displayInit()
 {
     lcdInit();
 
-	// Set up the LCD's number of columns and rows:
-	lcdBegin(LCD_WIDTH, LCD_HEIGHT);
-	
+    // Set up the LCD's number of columns and rows:
+    lcdBegin(LCD_WIDTH, LCD_HEIGHT);
+    
     // No scrolling and no cursor
-	lcdAutoscrollOff();
-	displayCursor(0, 0, cursorOff);
+    lcdAutoscrollOff();
+    displayCursor(0, 0, cursorOff);
 
 #ifndef DISPLAY_DISABLE_SCROLLING
-	// Initialise all line buffers with spaces
+    // Initialise all line buffers with spaces
     for( int line = 0 ; line < LCD_HEIGHT ; line++ )
     {
         memset( textBuf[line], ' ', LCD_WIDTH );
@@ -116,7 +116,7 @@ void displayInit()
     }
 #endif
 }
-	
+    
 // Set the cursor position and state (off, underline or blink)
 void displayCursor( uint8_t col, uint8_t line, enum eCursorState state )
 {
