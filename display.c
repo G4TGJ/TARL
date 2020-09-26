@@ -14,20 +14,26 @@
 #include "display.h"
 #include "lcd.h"
 
-// Keep track of each line
-static char textBuf[LCD_HEIGHT][ LCD_WIDTH + 1];
-
 // Keep track of the cursor position
 static uint8_t cursorCol, cursorLine;
 
+#ifndef DISPLAY_DISABLE_SCROLLING
+// Keep track of each line
+static char textBuf[LCD_HEIGHT][ LCD_WIDTH + 1];
+
 // Split point for the line
 static uint8_t splitPoint[LCD_HEIGHT];
+#endif
 
 // Update the line buffer
 // Text scrolls in from the right unless bReplace is true
 // in which case the new text replaces the existing line
 void displayText( uint8_t line, char *text, bool bReplace )
 {
+#ifdef DISPLAY_DISABLE_SCROLLING
+    // With no scrolling we just display the text on the line
+    char *pBuf = text;
+#else
 	// Number of chars in new string
 	uint8_t newLen = strlen( text );
 	
@@ -39,10 +45,12 @@ void displayText( uint8_t line, char *text, bool bReplace )
     {
         newLen = LCD_WIDTH;
     }
+#endif
 
     // Only do anything if the line is valid
     if( line < LCD_HEIGHT )
     {
+#ifndef DISPLAY_DISABLE_SCROLLING
         if( bReplace )
         {
             // Replacing line so copy text over and then pad with spaces
@@ -78,7 +86,7 @@ void displayText( uint8_t line, char *text, bool bReplace )
                 }
             }
         }
-
+#endif
         // Move to the start of the line and print the buffer
         lcdSetCursor( 0, line );
         lcdPrint( pBuf );
@@ -99,12 +107,14 @@ void displayInit()
 	lcdAutoscrollOff();
 	displayCursor(0, 0, cursorOff);
 
+#ifndef DISPLAY_DISABLE_SCROLLING
 	// Initialise all line buffers with spaces
     for( int line = 0 ; line < LCD_HEIGHT ; line++ )
     {
         memset( textBuf[line], ' ', LCD_WIDTH );
         textBuf[line][LCD_WIDTH] = '\0';
     }
+#endif
 }
 	
 // Set the cursor position and state (off, underline or blink)
@@ -137,6 +147,7 @@ void displayCursor( uint8_t col, uint8_t line, enum eCursorState state )
     }
 }
 
+#ifndef DISPLAY_DISABLE_SCROLLING
 // Split a line at the given column. This means text will scroll up to that
 // point.
 void displaySplitLine( uint8_t col, uint8_t line )
@@ -146,3 +157,4 @@ void displaySplitLine( uint8_t col, uint8_t line )
         splitPoint[line] = col;
     }
 }
+#endif
