@@ -85,13 +85,13 @@ static uint32_t xtalFreq;
 //
 static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency)
 {
-	// a, b and c as defined in AN619
-	uint32_t a, b, c;
+    // a, b and c as defined in AN619
+    uint32_t a, b, c;
 
-	// PLL config registers
-	uint32_t P1;
-	uint32_t P2;
-	uint32_t P3;
+    // PLL config registers
+    uint32_t P1;
+    uint32_t P2;
+    uint32_t P3;
 
     // We are only going to send bytes that have changed to minimise noise
     // from the I2C bus.
@@ -102,44 +102,44 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency)
     // Ensure PLL is within range
     if( pll < NUM_SYNTH_PLL )
     {
-	    // We will set the denominator as the crystal frequency divided by 27 as we
+        // We will set the denominator as the crystal frequency divided by 27 as we
         // want it to be about a million so it is as large as possible for greatest resolution.
         // (The maximum denominator is 1048575.)
-	    // This sets a maximum crystal of over 28MHz (crystal should be 25MHz or 27MHz)
-	    // This allows us to use 32 bit integers.
-	    // The error in the resulting frequency will be less than 1Hz
-	    #define DENOM_RATIO 27
-	    c = xtalFreq / DENOM_RATIO;
-	    
-	    // Calculate the pllFrequency: the divider * desired output frequency
-	    pllFreq[pll] = divider * frequency;
+        // This sets a maximum crystal of over 28MHz (crystal should be 25MHz or 27MHz)
+        // This allows us to use 32 bit integers.
+        // The error in the resulting frequency will be less than 1Hz
+        #define DENOM_RATIO 27
+        c = xtalFreq / DENOM_RATIO;
+        
+        // Calculate the pllFrequency: the divider * desired output frequency
+        pllFreq[pll] = divider * frequency;
 
-	    // Determine the multiplier to get to the required pllFrequency
-	    // Integer part is easy
-	    a = pllFreq[pll] / xtalFreq;
-	    
-	    // Work out the fractional part (b/c)
-	    // c is the denominator set above
-	    // Can easily get b because we set c as a fraction of xtalFreq
-	    // b = (pllFreq % xtalFreq) * c / xtalFreq
-	    // but c is xtalFreq/27 so we get:
-	    b = (pllFreq[pll] % xtalFreq) / DENOM_RATIO;
+        // Determine the multiplier to get to the required pllFrequency
+        // Integer part is easy
+        a = pllFreq[pll] / xtalFreq;
+        
+        // Work out the fractional part (b/c)
+        // c is the denominator set above
+        // Can easily get b because we set c as a fraction of xtalFreq
+        // b = (pllFreq % xtalFreq) * c / xtalFreq
+        // but c is xtalFreq/27 so we get:
+        b = (pllFreq[pll] % xtalFreq) / DENOM_RATIO;
 
-	    // Calculate the values as defined in AN619
-	    uint32_t p = 128 * b / c;
-	    P1 = 128 * a + p - 512;
-	    P2 = 128 * b - c * p;
-	    P3 = c;
-	    
-	    // Work out the new register values
-	    newPll[pll][0] = (P3 & 0x0000FF00) >> 8;
-	    newPll[pll][1] = (P3 & 0x000000FF);
-	    newPll[pll][2] = (P1 & 0x00030000) >> 16;
-	    newPll[pll][3] = (P1 & 0x0000FF00) >> 8;
-	    newPll[pll][4] = (P1 & 0x000000FF);
-	    newPll[pll][5] = ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16);
-	    newPll[pll][6] = (P2 & 0x0000FF00) >> 8;
-	    newPll[pll][7] = (P2 & 0x000000FF);
+        // Calculate the values as defined in AN619
+        uint32_t p = 128 * b / c;
+        P1 = 128 * a + p - 512;
+        P2 = 128 * b - c * p;
+        P3 = c;
+        
+        // Work out the new register values
+        newPll[pll][0] = (P3 & 0x0000FF00) >> 8;
+        newPll[pll][1] = (P3 & 0x000000FF);
+        newPll[pll][2] = (P1 & 0x00030000) >> 16;
+        newPll[pll][3] = (P1 & 0x0000FF00) >> 8;
+        newPll[pll][4] = (P1 & 0x000000FF);
+        newPll[pll][5] = ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16);
+        newPll[pll][6] = (P2 & 0x0000FF00) >> 8;
+        newPll[pll][7] = (P2 & 0x000000FF);
 
         // Write those registers that have changed
         for( int i = 0 ; i < NUM_PLL_BYTES ; i++ )
@@ -162,16 +162,16 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency)
 //
 static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c, uint8_t rDiv)
 {
-	uint32_t P1;					// Synth config register P1
-	uint32_t P2;					// Synth config register P2
-	uint32_t P3;					// Synth config register P3
+    uint32_t P1;					// Synth config register P1
+    uint32_t P2;					// Synth config register P2
+    uint32_t P3;					// Synth config register P3
     uint8_t  Div4 = 0;              // Divide by 4 bits
 
-	// Calculate the values as defined in AN619
-	uint32_t p = 128 * b / c;
-	P1 = 128 * a + p - 512;
-	P2 = 128 * b - c * p;
-	P3 = c;
+    // Calculate the values as defined in AN619
+    uint32_t p = 128 * b / c;
+    P1 = 128 * a + p - 512;
+    P2 = 128 * b - c * p;
+    P3 = c;
 
     // If the divider is 4 then special bits to set
     if( a == 4 )
@@ -179,14 +179,14 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c, u
         Div4 = 0x0c;
     }
 
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 0,   (P3 & 0x0000FF00) >> 8);
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 1,   (P3 & 0x000000FF));
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv | Div4 );
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 3,   (P1 & 0x0000FF00) >> 8);
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 4,   (P1 & 0x000000FF));
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 6,   (P2 & 0x0000FF00) >> 8);
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 7,   (P2 & 0x000000FF));
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 0,   (P3 & 0x0000FF00) >> 8);
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 1,   (P3 & 0x000000FF));
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv | Div4 );
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 3,   (P1 & 0x0000FF00) >> 8);
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 4,   (P1 & 0x000000FF));
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 6,   (P2 & 0x0000FF00) >> 8);
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, synth + 7,   (P2 & 0x000000FF));
 }
 
 //
@@ -196,7 +196,7 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c, u
 //
 static void si5351aOutputOff(uint8_t clk)
 {
-	i2cWriteRegister(SI5351A_I2C_ADDRESS, clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+    i2cWriteRegister(SI5351A_I2C_ADDRESS, clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 }
 
 // Enable/disable the clock output
@@ -207,9 +207,9 @@ static void si5351aOutputEnable( uint8_t clk, bool bEnable )
 {
     uint8_t reg;
 
-	// Read the existing register
-	if( i2cReadRegister(SI5351A_I2C_ADDRESS, SI_CLK_ENABLE, &reg) == 0 )
-	{
+    // Read the existing register
+    if( i2cReadRegister(SI5351A_I2C_ADDRESS, SI_CLK_ENABLE, &reg) == 0 )
+    {
         if( bEnable )
         {
             // Enable by clearing the bit
@@ -220,8 +220,8 @@ static void si5351aOutputEnable( uint8_t clk, bool bEnable )
             // Disable by setting the bit
             reg |= clk;
         }
-    	i2cWriteRegister( SI5351A_I2C_ADDRESS, SI_CLK_ENABLE, reg );
-	}
+        i2cWriteRegister( SI5351A_I2C_ADDRESS, SI_CLK_ENABLE, reg );
+    }
 }
 
 // Enable/disable a clock output
@@ -229,7 +229,7 @@ void oscClockEnable( uint8_t clock, bool bEnable )
 {
     if( clock < NUM_CLOCKS )
     {
-    	si5351aOutputEnable( SI_CLK_ENABLE_0 << clock, bEnable );
+        si5351aOutputEnable( SI_CLK_ENABLE_0 << clock, bEnable );
     }
 }
 
@@ -468,7 +468,7 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
     static int8_t quadrature;
 
     // To get the output frequency the PLL is divided by a+b/c
-	uint32_t a, b, c;
+    uint32_t a, b, c;
 
     // Clocks 0 and 1 share a PLL so need a divider for the other clock
     uint32_t a1, b1, c1;
@@ -479,8 +479,8 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
     // The first (or only) clock we are setting
     uint8_t firstClock;
 
-	// We will reset the PLLs only when the divider or quadrature changes
-	static uint32_t prevDivider[NUM_CLOCKS];
+    // We will reset the PLLs only when the divider or quadrature changes
+    static uint32_t prevDivider[NUM_CLOCKS];
     static int8_t prevQuadrature;
 
     static uint8_t rDiv[NUM_CLOCKS];
@@ -509,18 +509,18 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
             }
         }
 
-	    // Get the predetermined multisynth divider for the frequency
+        // Get the predetermined multisynth divider for the frequency
         if( clock == 2 )
         {
-    	    a = getMultisynthDivider( frequency, false );
-    	    b = 0;
-    	    c = 1;
+            a = getMultisynthDivider( frequency, false );
+            b = 0;
+            c = 1;
             pll_reset = SI_PLL_RESET_B;
             pll_clock = SI_CLK_SRC_PLL_B;
             firstClock = 2;
 
-	        // Set up the PLL
-	        setupPLL(SYNTH_PLL_B, a, frequency);
+            // Set up the PLL
+            setupPLL(SYNTH_PLL_B, a, frequency);
         }
         else
         {
@@ -538,12 +538,12 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
             if( clockFreq[0] >= clockFreq[1] )
             {
                 // Clock 0 is the higher frequency so get its integer divider
-    	        a = getMultisynthDivider( clockFreq[0], quadrature != 0 );
-    	        b = 0;
-    	        c = 1;
+                a = getMultisynthDivider( clockFreq[0], quadrature != 0 );
+                b = 0;
+                c = 1;
 
-	            // Set up the PLL
-	            setupPLL(SYNTH_PLL_A, a, clockFreq[0]);
+                // Set up the PLL
+                setupPLL(SYNTH_PLL_A, a, clockFreq[0]);
 
                 // Work out the required divider for clock 1
                 if( quadrature )
@@ -562,12 +562,12 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
             {
                 // Clock 1 is the higher frequency so get its integer divider
                 // In quadrature mode won't get here as the oscillator frequencies are equal
-    	        a1 = getMultisynthDivider( clockFreq[1], false );
-    	        b1 = 0;
-    	        c1 = 1;
+                a1 = getMultisynthDivider( clockFreq[1], false );
+                b1 = 0;
+                c1 = 1;
 
-	            // Set up the PLL
-	            setupPLL(SYNTH_PLL_A, a1, clockFreq[1]);
+                // Set up the PLL
+                setupPLL(SYNTH_PLL_A, a1, clockFreq[1]);
 
                 // Work out the required divider for clock 0
                 calcDivider( clockFreq[0], pllFreq[SYNTH_PLL_A], &a, &b, &c );
@@ -618,17 +618,17 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
             delay(1);
         }
 
-	    // If the divider has changed then set everything up
-	    // This will usually only happen at power up
-	    // but will also happen if the frequency changes enough
-	    if( a != prevDivider[clock] )
-	    {
-    	    // Reset the PLLs. This causes a glitch in the output. For small changes to
-    	    // the parameters, you don't need to reset the PLL, and there is no glitch
-    	    i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_PLL_RESET, pll_reset);
+        // If the divider has changed then set everything up
+        // This will usually only happen at power up
+        // but will also happen if the frequency changes enough
+        if( a != prevDivider[clock] )
+        {
+            // Reset the PLLs. This causes a glitch in the output. For small changes to
+            // the parameters, you don't need to reset the PLL, and there is no glitch
+            i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_PLL_RESET, pll_reset);
 
-    	    prevDivider[clock] = a;
-	    }
+            prevDivider[clock] = a;
+        }
     }
 }
 
@@ -678,9 +678,9 @@ bool oscInit( void )
         si5351aOutputEnable( SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false );
 
         // Power down all the output drivers
-	    si5351aOutputOff(SI_CLK0_CONTROL);
-	    si5351aOutputOff(SI_CLK1_CONTROL);
-	    si5351aOutputOff(SI_CLK2_CONTROL);
+        si5351aOutputOff(SI_CLK0_CONTROL);
+        si5351aOutputOff(SI_CLK1_CONTROL);
+        si5351aOutputOff(SI_CLK2_CONTROL);
 
         // Set the crystal load capacitance
         i2cWriteRegister( SI5351A_I2C_ADDRESS, SI_XTAL_LOAD, SI_XTAL_LOAD_CAP );

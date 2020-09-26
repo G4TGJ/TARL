@@ -20,7 +20,7 @@ static uint8_t i2cStart(uint8_t address, bool bRead )
 
     TWI0.MADDR = (address << 1) | bRead;
 
-	for ( i = 0 ; (i < MAX_ITERATIONS) && !(TWI0.MSTATUS & (TWI_WIF_bm | TWI_RIF_bm)) ; i++);
+    for ( i = 0 ; (i < MAX_ITERATIONS) && !(TWI0.MSTATUS & (TWI_WIF_bm | TWI_RIF_bm)) ; i++);
 
     if( i == MAX_ITERATIONS )
     {
@@ -49,33 +49,33 @@ static uint8_t i2cByteSend(uint8_t data)
 {
     int i;
 
-	for ( i = 0 ; ((i < MAX_ITERATIONS) && !(TWI0.MSTATUS & TWI_WIF_bm)) ; i++);
+    for ( i = 0 ; ((i < MAX_ITERATIONS) && !(TWI0.MSTATUS & TWI_WIF_bm)) ; i++);
 
-	if( i == MAX_ITERATIONS )
-	{
-    	return false;
-	}
-	else
-	{
+    if( i == MAX_ITERATIONS )
+    {
+        return false;
+    }
+    else
+    {
         TWI0.MDATA = data;
         TWI0.MCTRLB = TWI_MCMD_RECVTRANS_gc;
 
         return !(TWI0.MSTATUS & TWI_RXACK_bm);
-	}
+    }
 }
 
 static uint8_t i2cByteRead()
 {
     int i;
 
-	for ( i = 0 ; (i < MAX_ITERATIONS) && !(TWI0.MSTATUS & TWI_RIF_bm) ; i++);
+    for ( i = 0 ; (i < MAX_ITERATIONS) && !(TWI0.MSTATUS & TWI_RIF_bm) ; i++);
 
-	if( i == MAX_ITERATIONS )
-	{
-    	return 0;
-	}
-	else
-	{
+    if( i == MAX_ITERATIONS )
+    {
+        return 0;
+    }
+    else
+    {
         uint8_t data = TWI0.MDATA;
         TWI0.MCTRLB = TWI_ACKACT_bm | TWI_MCMD_RECVTRANS_gc;
         return data;
@@ -84,40 +84,40 @@ static uint8_t i2cByteRead()
 
 uint8_t i2cWriteRegister(uint8_t addr, uint8_t reg, uint8_t data)
 {
-	uint8_t stts;
-	
-	stts = i2cStart(addr, false);
-	if (!stts) return 1;
+    uint8_t stts;
+    
+    stts = i2cStart(addr, false);
+    if (!stts) return 1;
 
-	stts = i2cByteSend(reg);
-	if (!stts) return 3;
+    stts = i2cByteSend(reg);
+    if (!stts) return 3;
 
-	stts = i2cByteSend(data);
-	if (!stts) return 4;
+    stts = i2cByteSend(data);
+    if (!stts) return 4;
 
-	i2cStop();
+    i2cStop();
 
-	return 0;
+    return 0;
 }
 
 uint8_t i2cReadRegister(uint8_t addr, uint8_t reg, uint8_t *data)
 {
-	uint8_t stts;
-	
-	stts = i2cStart(addr, false);
-	if (!stts) return 1;
+    uint8_t stts;
+    
+    stts = i2cStart(addr, false);
+    if (!stts) return 1;
 
-	stts = i2cByteSend(reg);
-	if (!stts) return 3;
+    stts = i2cByteSend(reg);
+    if (!stts) return 3;
 
-	stts = i2cStart(addr, true);
-	if (!stts) return 4;
+    stts = i2cStart(addr, true);
+    if (!stts) return 4;
 
-	*data = i2cByteRead();
+    *data = i2cByteRead();
 
-	i2cStop();
+    i2cStop();
 
-	return 0;
+    return 0;
 }
 
 // Init TWI (I2C)
