@@ -587,9 +587,14 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
         delay(1);
 
         // Set quadrature mode if applicable (only for clock 0 or clock 1)
-        if( (clock != 2) && (quadrature != 0) )
+        if( clock != 2 )
         {
-            if( quadrature > 0)
+            if( quadrature < 0)
+            {
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
+            }
+            else if( quadrature > 0)
             {
                 i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, a);
                 i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
@@ -597,7 +602,7 @@ void oscSetFrequency( uint8_t clock, uint32_t frequency, int8_t q )
             else
             {
                 i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK0_PHOFF, 0);
-                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, a);
+                i2cWriteRegister(SI5351A_I2C_ADDRESS, SI_CLK1_PHOFF, 0);
             }
         }
 
