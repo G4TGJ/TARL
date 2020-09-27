@@ -11,7 +11,6 @@
 #include "rotary.h"
 #include "pushbutton.h"
 #include "io.h"
-#include "millis.h"
 
 // Read the rotary control and decide which direction it is moving in
 // Also handle the pushbutton. Debounce it and decide if it's a short or long press
@@ -70,67 +69,53 @@ void readRotary( bool *pbCW, bool *pbCCW, bool *pbShortPress, bool *pbLongPress 
             };
             const enum eTransition direction[] =
             {
-                INVALID,
-                CW,
-                CCW,
-                INVALID,
-                CCW,
-                INVALID,
-                INVALID,
-                CW,
-                CW,
-                INVALID,
-                INVALID,
-                CCW,
-                INVALID,
-                CCW,
-                CW,
-                INVALID
+                INVALID,    // 0000 0 0
+                CW,         // 0001 1 1
+                CCW,        // 0010 2 2
+                INVALID,    // 0011 3 3
+                CCW,        // 0100 4 4
+                INVALID,    // 0101 5 5
+                INVALID,    // 0110 6 6
+                CW,         // 0111 7 7
+                CW,         // 1000 8 8
+                INVALID,    // 1001 9 9
+                INVALID,    // 1010 A 10
+                CCW,        // 1011 B 11
+                INVALID,    // 1100 C 12
+                CCW,        // 1101 D 13
+                CW,         // 1110 E 14
+                INVALID     // 1111 F 15
             };
 
             // Keep track of the transitions
             static uint8_t transition;
 
-            // The previous direction - need enough transitions in the same direction
-            static int8_t prevDirection;
-
-            // How many transitions in the same direction
-            // We start with a count of 1 because the first transition is always
-            // in a new direction
-            static uint8_t countDirection = 1;
-
             // Work out the transition - shift the previous state up and incorporate the new state
             transition = ((transition&3)<<2) | (bRotaryB<<1) | bRotaryA;
 
-            // For a valid rotation need 4 valid rotations in that direction
-            countDirection++;
-            if( direction[transition] == prevDirection )
+            // We ignore invalid transitions
+            if( direction[transition] != INVALID )
             {
-                if( countDirection == 4 )
-                {
-                    // Have got our 4 transition in the same direction
-                    if( prevDirection == CW )
-                    {
-                        *pbCW = true;
-                    }
-                    else
-                    {
-                        *pbCCW = true;
-                    }
+                // Keep track of the current state, made up of the current and previous
+                // transition. Ideally we'd look for all 4 valid transitions but if
+                // the control is noisy we would struggle to detect many clicks so
+                // just look for two.
+                static uint8_t state;
+                state = (state << 4) | transition;
 
-                    // Start counting again
-                    countDirection = 0;
+                // If the transitions are 1 followed by 7 in the above table, then it is
+                // clockwise
+                if( (state == 0x17) )
+                {
+                    *pbCW = true;
+                }
+                // If the transitions are 2 followed by b in the above table, then it is
+                // counter clockwise
+                else if( (state == 0x2b) )
+                {
+                    *pbCCW = true;
                 }
             }
-            else
-            {
-                // Invalid so start counting again
-                // Since this invalid transition is probably a bounce we start with a
-                // count of 1 since the next transition is probably going to be different
-                countDirection = 1;
-                prevDirection = direction[transition];
-            }
-
             prevbRotaryA = bRotaryA;
             prevbRotaryB = bRotaryB;
         }
