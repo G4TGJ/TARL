@@ -1,0 +1,21 @@
+FROM ubuntu:20.04
+
+RUN apt-get update && apt-get install -y \
+	git \
+	make \
+	wget \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN wget https://blog.zakkemble.net/download/avr-gcc-10.1.0-x64-linux.tar.bz2
+RUN tar jxf avr-gcc-10.1.0-x64-linux.tar.bz2
+
+RUN mkdir /home/dev
+WORKDIR /home/dev
+
+RUN git clone https://github.com/G4TGJ/Serial817.git
+
+ENV PATH=$PATH:/avr-gcc-10.1.0-x64-linux/bin
+
+COPY . TARL
+
+WORKDIR .

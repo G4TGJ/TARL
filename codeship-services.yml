@@ -2,3 +2,8 @@ app:
   build:
     image: tarl
     dockerfile: dockerfile
+
+app-1-series:
+  build:
+    image: tarl-1-series
+    dockerfile: dockerfile-1-series

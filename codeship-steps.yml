@@ -4,4 +4,7 @@
 - name: TATC
   service: app
   command: /bin/sh -c 'cd TATC/TATC && ./build.sh'
+- name: Serial817
+  service: app-1-series
+  command: /bin/sh -c 'cd Serial817/Serial817 && ./builddocker.sh'
   
