@@ -37,11 +37,29 @@
 #endif
 #endif
 
+// For the ATtiny 1-series CLOCK_DIV should be defined in config.h
 #if defined TCA0
-#define CLOCK_DIV 1
+#if CLOCK_DIV == 1
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV1_gc
+#elif CLOCK_DIV == 2
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV2_gc
+#elif CLOCK_DIV == 4
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV4_gc
+#elif CLOCK_DIV == 8
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV8_gc
+#elif CLOCK_DIV == 16
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV16_gc
+#elif CLOCK_DIV == 64
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV64_gc
+#elif CLOCK_DIV == 256
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV256_gc
+#elif CLOCK_DIV == 1024
+#define CLOCK_SELECT TCA_SINGLE_CLKSEL_DIV1024_gc
+#endif
 #endif
 
 // Clock is running at fraction of CPU clock
+// Calculate the number of ticks for one millisecond
 #define CTC_MATCH_OVERFLOW (F_CPU / CLOCK_DIV / 1000)
 
 volatile uint32_t timer1_ticks;
@@ -116,7 +134,7 @@ void millisInit(void)
 
     TCA0.SINGLE.PER = CTC_MATCH_OVERFLOW;
 
-    TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc /* System Clock */
+    TCA0.SINGLE.CTRLA = CLOCK_SELECT 
                         | 1 << TCA_SINGLE_ENABLE_bp /* Module Enable: enabled */;
 
 #else
