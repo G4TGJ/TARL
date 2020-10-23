@@ -367,8 +367,8 @@ bool morseScanPaddles( void )
     // Time of next scan
     static unsigned long nextScan;
 
-    // The time we have already waited after a dot or dash
-    static int delayAlready;
+    // The time when the second gap after a dot or dash ends
+    static int secondGapTime;
 
     // Early read of paddle states
     static bool dotPressedEarly;
@@ -457,7 +457,11 @@ bool morseScanPaddles( void )
                     // But we split this in case the paddle is pressed early
                     keyDown( false );
                     morseState = firstGap;
-                    requiredDelay = delayAlready = dotLen / 3;
+                    requiredDelay = dotLen / 3;
+
+                    // Note when the second gap should end - this allows for delays in
+                    // the keyDown function
+                    secondGapTime = currentTime + dotLen;
 
                     // Note the time when the gap started
                     charGapStartTime = currentTime;
@@ -471,8 +475,8 @@ bool morseScanPaddles( void )
                     // This means we will note the state early
                     morseState = secondGap;
 
-                    // Calculate the remainder of the gap (allows for integer truncation)
-                    requiredDelay = dotLen - delayAlready;
+                    // Calculate the remainder of the gap
+                    requiredDelay = secondGapTime - currentTime;
                     break;
 
                 case secondGap:
