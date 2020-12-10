@@ -1,6 +1,9 @@
 - name: FreqGen5351
   service: app
   command: /bin/sh -c 'cd FreqGen5351/FreqGen5351 && ./build.sh'
+- name: MorseKeyer
+  service: app
+  command: /bin/sh -c 'cd MorseKeyer/TMK/TMK && ./build.sh'
 - name: TATC
   service: app-1-series
   command: /bin/sh -c 'cd TATC/TATC && ./builddocker.sh'
