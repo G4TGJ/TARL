@@ -9,11 +9,11 @@
 
  #include "config.h"
 
- #ifdef LCD_I2C
+ #if defined LCD_I2C
 
  #include "lcd_i2c.c"
 
- #elif LCD_PORT
+ #elif defined LCD_PORT
 
  #include "lcd_port.c"
 
