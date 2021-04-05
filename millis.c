@@ -15,7 +15,15 @@
 #ifdef OCR1AH
 
 // 16 bit timer
-#if F_CPU == 16000000
+#if F_CPU == 1000000
+// 1MHz: clock divided by 1
+#define CLOCK_DIV 1
+#define CLOCK_SELECT  ((1 << CS10))
+#elif F_CPU == 8000000
+// 8MHz: clock divided by 8
+#define CLOCK_DIV 8
+#define CLOCK_SELECT  ((1 << CS11))
+#elif F_CPU == 16000000
 // 16MHz: clock divided by 8
 #define CLOCK_DIV 8
 #define CLOCK_SELECT  ((1 << CS11))
@@ -73,7 +81,11 @@ ISR(TCA0_OVF_vect)
     TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
 }
 #else
+#ifdef TIMER1_COMPA_vect
 ISR (TIMER1_COMPA_vect)
+#elif defined TIM1_COMPA_vect 
+ISR (TIM1_COMPA_vect)
+#endif
 {
     timer1_ticks++;
 }
@@ -106,7 +118,8 @@ void millisInit(void)
 #ifdef OCR1AH
     // 16 bit timer
     // CTC mode, Clock/8
-    TCCR1B |= (1 << WGM12) | CLOCK_SELECT;
+    TCCR1A = 0;
+    TCCR1B = (1 << WGM12) | CLOCK_SELECT;
     
     // Load the high byte, then the low byte
     // into the output compare
