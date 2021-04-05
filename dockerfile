@@ -1,4 +1,4 @@
-FROM opthomasprime/avr-gcc
+FROM tmsmr/avr-gcc
 
 RUN mkdir /home/dev
 WORKDIR /home/dev
