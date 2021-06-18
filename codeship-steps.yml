@@ -4,6 +4,9 @@
 - name: MorseKeyer
   service: app
   command: /bin/sh -c 'cd MorseKeyer/TMK/TMK && ./build.sh'
+- name: MSFClock
+  service: app
+  command: /bin/sh -c 'cd MSFClock/MSFClock && ./build.sh'
 - name: TATC
   service: app-1-series
   command: /bin/sh -c 'cd TATC/TATC && ./builddocker.sh'
