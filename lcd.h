@@ -70,6 +70,11 @@ void lcdSetCursor(uint8_t col, uint8_t row);
 /// @param[in] string Pointer to the null terminated string
 void lcdPrint( const char *string );
 
+// Turn the backlight on or off
+// This function is only available with the I2C interface
+// unless separately implemented
+void lcdBacklight( bool bOn );
+
 // Internal functions
 // Do not call these
 void lcdIFInit();

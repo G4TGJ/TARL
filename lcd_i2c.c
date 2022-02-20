@@ -67,3 +67,9 @@ void lcdRW( bool bOn )
 {
     lcdI2CWrite( (regVal & ~LCD_RW_BIT) | (bOn ? LCD_RW_BIT : 0) );
 }
+
+// Set or clear the backlight bit
+void lcdBacklight( bool bOn )
+{
+    lcdI2CWrite( (regVal & ~LCD_BACKLIGHT) | (bOn ? LCD_BACKLIGHT : 0) );
+}
