@@ -25,8 +25,14 @@
 #define DATA_BITS (0xF<<DATA_POS)
 
 // Keep track of the current register value
-// Default to having the backlight on
-static uint8_t regVal = LCD_BACKLIGHT;
+// Default to having the backlight on unless overriden
+#ifdef BACKLIGHT_STARTS_OFF
+#define BACKLIGHT_STATE LCD_NOBACKLIGHT
+#else
+#define BACKLIGHT_STATE LCD_BACKLIGHT
+#endif
+
+static uint8_t regVal = BACKLIGHT_STATE;
 
 // Initialise the LCD interface i.e. the I2C interface
 void lcdIFInit()
